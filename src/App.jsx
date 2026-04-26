@@ -16,6 +16,11 @@ export default function App() {
   function goNext() { setStep(s => Math.min(s + 1, 4)) }
   function goBack() { setStep(s => Math.max(s - 1, 1)) }
 
+  function goBackFromCustomize() {
+    setPhotos([])
+    setStep(2)
+  }
+
   function restart() {
     setStep(1)
     setPhotos([])
@@ -48,8 +53,9 @@ export default function App() {
             frameColor={frameColor}
             onFilterChange={setFilter}
             onFrameColorChange={setFrameColor}
+            onPhotosChange={setPhotos}
             onNext={goNext}
-            onBack={goBack}
+            onBack={goBackFromCustomize}
           />
         )}
         {step === 4 && (
@@ -59,6 +65,7 @@ export default function App() {
             filter={filter}
             frameColor={frameColor}
             onRestart={restart}
+            onBack={goBack}
           />
         )}
       </main>

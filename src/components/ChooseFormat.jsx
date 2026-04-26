@@ -61,13 +61,15 @@ export default function ChooseFormat({ format, onSelect, onNext }) {
           <button
             key={f.id}
             onClick={() => onSelect(f)}
-            className={`flex flex-col items-center justify-center gap-4 p-6 rounded-xl border-2 bg-white transition-all ${
+            className={`h-52 flex flex-col items-center justify-center gap-4 p-6 rounded-xl border-2 bg-white transition-all ${
               format.id === f.id
                 ? 'border-[#8B3714] shadow-sm'
                 : 'border-[#e5e0d8] hover:border-[#c5bfb8]'
             }`}
           >
-            <FormatIcon layout={f.layout} />
+            <div className="h-16 flex items-center justify-center">
+              <FormatIcon layout={f.layout} />
+            </div>
             <div className="text-center">
               <p className="font-medium text-[#1a1614] text-sm">{f.name}</p>
               <p className="text-xs text-[#7a6f68] mt-0.5">{f.description}</p>

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { compositePhoto } from '../utils/canvas'
 
-export default function SaveShareStep({ format, photos, filter, frameColor, onRestart }) {
+export default function SaveShareStep({ format, photos, filter, frameColor, onRestart, onBack }) {
   const [outputUrl, setOutputUrl] = useState(null)
   const [generating, setGenerating] = useState(true)
 
@@ -23,8 +23,7 @@ export default function SaveShareStep({ format, photos, filter, frameColor, onRe
     const img = new Image()
     img.onload = () => {
       const c = document.createElement('canvas')
-      c.width = img.width
-      c.height = img.height
+      c.width = img.width; c.height = img.height
       const ctx = c.getContext('2d')
       ctx.fillStyle = '#ffffff'
       ctx.fillRect(0, 0, c.width, c.height)
@@ -39,18 +38,7 @@ export default function SaveShareStep({ format, photos, filter, frameColor, onRe
 
   function print() {
     const win = window.open('', '_blank')
-    win.document.write(`
-      <html>
-        <head>
-          <title>Framr — ${format.name}</title>
-          <style>
-            body { margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; background: #fff; }
-            img { max-width: 100%; max-height: 100vh; object-fit: contain; }
-          </style>
-        </head>
-        <body><img src="${outputUrl}" onload="window.print();window.close();" /></body>
-      </html>
-    `)
+    win.document.write(`<html><head><title>Framr</title><style>body{margin:0;display:flex;justify-content:center;align-items:center;min-height:100vh;background:#fff;}img{max-width:100%;max-height:100vh;object-fit:contain;}</style></head><body><img src="${outputUrl}" onload="window.print();window.close();" /></body></html>`)
     win.document.close()
   }
 
@@ -63,6 +51,10 @@ export default function SaveShareStep({ format, photos, filter, frameColor, onRe
     } catch (_) {}
   }
 
+  const btnBase = 'flex items-center justify-center gap-2 py-3 rounded-lg font-medium transition-colors text-sm w-full'
+  const btnPrimary = `${btnBase} bg-[#8B3714] text-white hover:bg-[#732e10]`
+  const btnSecondary = `${btnBase} border border-[#e5e0d8] bg-white text-[#1a1614] hover:bg-[#f5f0ea]`
+
   const iconDown = (
     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
       <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
@@ -71,78 +63,89 @@ export default function SaveShareStep({ format, photos, filter, frameColor, onRe
     </svg>
   )
 
+  if (generating) {
+    return (
+      <div className="flex flex-col items-center justify-center h-full gap-3">
+        <div className="w-8 h-8 border-2 border-[#8B3714] border-t-transparent rounded-full animate-spin" />
+        <p className="text-sm text-[#7a6f68]">Compositing your print…</p>
+      </div>
+    )
+  }
+
   return (
-    <div className="flex flex-col items-center justify-center h-full gap-6 p-8">
-      {generating ? (
-        <div className="flex flex-col items-center gap-3">
-          <div className="w-8 h-8 border-2 border-[#8B3714] border-t-transparent rounded-full animate-spin" />
-          <p className="text-sm text-[#7a6f68]">Compositing your print…</p>
+    <div className="flex h-full">
+      {/* Left — large preview */}
+      <div className="flex-1 flex items-center justify-center bg-[#f5f0ea] p-10 overflow-auto">
+        {outputUrl && (
+          <img
+            src={outputUrl}
+            alt="Your print"
+            className="max-w-full max-h-full object-contain rounded-lg shadow-2xl"
+          />
+        )}
+      </div>
+
+      {/* Right — actions panel */}
+      <div className="w-80 shrink-0 border-l border-[#e5e0d8] bg-white flex flex-col">
+        <div className="h-16 px-6 border-b border-[#e5e0d8] flex items-center shrink-0">
+          <div>
+            <h2 className="font-semibold text-[#1a1614] leading-none">Save & Share</h2>
+            <p className="text-xs text-[#7a6f68] mt-0.5">Download or print</p>
+          </div>
         </div>
-      ) : (
-        <>
-          <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#8B3714" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-            <polyline points="20 6 9 17 4 12"/>
-          </svg>
 
-          <div className="text-center">
-            <h1 className="text-2xl font-semibold text-[#1a1614] mb-1">Your strip is ready</h1>
-            <p className="text-sm text-[#7a6f68]">
-              {format.name} · {format.photoCount} {format.photoCount === 1 ? 'photo' : 'photos'}
-            </p>
-          </div>
-
-          {outputUrl && (
-            <div className="max-h-56 overflow-hidden rounded-lg shadow-lg">
-              <img src={outputUrl} alt="Your print" className="h-full w-auto object-contain" />
-            </div>
-          )}
-
-          <div className="flex flex-col gap-3 w-full max-w-xs">
-            <div className="flex gap-3">
-              <button
-                onClick={downloadPng}
-                className="flex-1 bg-[#8B3714] text-white py-3 rounded-lg font-medium hover:bg-[#732e10] transition-colors flex items-center justify-center gap-2"
-              >
-                {iconDown} Download PNG
-              </button>
-              <button
-                onClick={downloadJpeg}
-                className="flex-1 border border-[#e5e0d8] bg-white text-[#1a1614] py-3 rounded-lg font-medium hover:bg-[#f5f0ea] transition-colors flex items-center justify-center gap-2"
-              >
-                {iconDown} Download JPEG
-              </button>
-            </div>
-            <div className="flex gap-3">
-              <button
-                onClick={print}
-                className="flex-1 border border-[#e5e0d8] bg-white text-[#1a1614] py-3 rounded-lg font-medium hover:bg-[#f5f0ea] transition-colors flex items-center justify-center gap-2"
-              >
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <polyline points="6 9 6 2 18 2 18 9"/>
-                  <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/>
-                  <rect x="6" y="14" width="12" height="8"/>
-                </svg>
-                Print
-              </button>
-              <button
-                onClick={share}
-                className="flex-1 border border-[#e5e0d8] bg-white text-[#1a1614] py-3 rounded-lg font-medium hover:bg-[#f5f0ea] transition-colors flex items-center justify-center gap-2"
-              >
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
-                  <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
-                  <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
-                </svg>
-                Share
-              </button>
+        <div className="flex-1 overflow-y-auto p-6 flex flex-col gap-6">
+          {/* Status */}
+          <div className="flex items-center gap-3 p-4 bg-[#f5f0ea] rounded-xl">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8B3714" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="20 6 9 17 4 12"/>
+            </svg>
+            <div>
+              <p className="font-semibold text-[#1a1614] text-sm leading-none mb-0.5">Your strip is ready</p>
+              <p className="text-xs text-[#7a6f68]">
+                {format.name} · {format.photoCount} {format.photoCount === 1 ? 'photo' : 'photos'}
+              </p>
             </div>
           </div>
 
-          <button onClick={onRestart} className="text-sm text-[#7a6f68] hover:text-[#1a1614] transition-colors">
+          {/* Download */}
+          <div className="flex flex-col gap-2">
+            <p className="text-xs font-semibold text-[#7a6f68] uppercase tracking-wider">Download</p>
+            <button onClick={downloadPng} className={btnPrimary}>{iconDown} Download PNG</button>
+            <button onClick={downloadJpeg} className={btnSecondary}>{iconDown} Download JPEG</button>
+          </div>
+
+          {/* Other */}
+          <div className="flex flex-col gap-2">
+            <p className="text-xs font-semibold text-[#7a6f68] uppercase tracking-wider">Other</p>
+            <button onClick={print} className={btnSecondary}>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="6 9 6 2 18 2 18 9"/>
+                <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/>
+                <rect x="6" y="14" width="12" height="8"/>
+              </svg>
+              Print
+            </button>
+            <button onClick={share} className={btnSecondary}>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
+                <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
+                <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+              </svg>
+              Share
+            </button>
+          </div>
+        </div>
+
+        <div className="p-6 border-t border-[#e5e0d8] flex flex-col gap-1 shrink-0">
+          <button onClick={onBack} className="text-sm text-[#7a6f68] hover:text-[#1a1614] transition-colors text-left py-1">
+            ← Back to customize
+          </button>
+          <button onClick={onRestart} className="text-sm text-[#7a6f68] hover:text-[#1a1614] transition-colors text-left py-1">
             ← Start a new strip
           </button>
-        </>
-      )}
+        </div>
+      </div>
     </div>
   )
 }
