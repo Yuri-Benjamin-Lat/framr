@@ -27,8 +27,7 @@ function PrintPreview({ format, photos, filter, frameColor, onPhotosChange }) {
         onDragOver={canDrag ? e => e.preventDefault() : undefined}
         onDrop={canDrag ? () => handleDrop(i) : undefined}
         style={{
-          width: w,
-          height: h,
+          width: w, height: h,
           overflow: 'hidden',
           filter: fi,
           flexShrink: 0,
@@ -78,16 +77,22 @@ function PrintPreview({ format, photos, filter, frameColor, onPhotosChange }) {
         </div>
       )
       break
-    case 'mixed-narrative':
+    case 'mixed-narrative': {
+      const topW = 500
+      const topH = Math.round(topW * 9 / 16)
+      const gap = 8
+      const bottomW = Math.round((topW - gap * 2) / 3)
+      const bottomH = Math.round(bottomW * 3 / 4)
       preview = (
-        <div style={{ background: bg, padding: 16, display: 'inline-flex', flexDirection: 'row', gap: 8, boxShadow: shadow }}>
-          {slot(photos[0], 280, 292, 0)}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-            {photos.slice(1).map((p, i) => slot(p, 140, 88, i + 1))}
+        <div style={{ background: bg, padding: 16, display: 'inline-flex', flexDirection: 'column', gap: 8, boxShadow: shadow }}>
+          {slot(photos[0], topW, topH, 0)}
+          <div style={{ display: 'flex', flexDirection: 'row', gap: 8 }}>
+            {photos.slice(1).map((p, i) => slot(p, bottomW, bottomH, i + 1))}
           </div>
         </div>
       )
       break
+    }
   }
 
   return (
@@ -114,7 +119,6 @@ export default function CustomizeStep({
         onPhotosChange={onPhotosChange}
       />
 
-      {/* Controls panel */}
       <div className="w-72 shrink-0 border-l border-[#e5e0d8] bg-white flex flex-col overflow-hidden">
         <div className="h-16 px-5 border-b border-[#e5e0d8] flex items-center shrink-0">
           <div>
@@ -128,7 +132,6 @@ export default function CustomizeStep({
             <p className="text-xs text-[#7a6f68]">Drag photos in the preview to reorder them.</p>
           )}
 
-          {/* Filters */}
           <div>
             <p className="text-xs font-semibold text-[#7a6f68] uppercase tracking-wider mb-3">Filter</p>
             <div className="grid grid-cols-2 gap-2">
@@ -149,7 +152,6 @@ export default function CustomizeStep({
             </div>
           </div>
 
-          {/* Frame color */}
           <div>
             <p className="text-xs font-semibold text-[#7a6f68] uppercase tracking-wider mb-3">Frame Color</p>
             <div className="flex gap-2 flex-wrap">
@@ -184,7 +186,6 @@ export default function CustomizeStep({
         </div>
       </div>
 
-      {/* Confirmation modal */}
       {showBackModal && (
         <div className="absolute inset-0 bg-black/40 flex items-center justify-center z-10">
           <div className="bg-white rounded-2xl p-6 max-w-sm w-full mx-4 shadow-xl">

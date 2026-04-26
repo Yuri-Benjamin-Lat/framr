@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useCallback } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useCamera } from '../hooks/useCamera'
 
 export default function CameraStep({ format, photos, onPhotosChange, onNext, onBack }) {
@@ -6,6 +6,7 @@ export default function CameraStep({ format, photos, onPhotosChange, onNext, onB
   const [timerDuration, setTimerDuration] = useState(3)
   const [countdown, setCountdown] = useState(null)
   const [flashing, setFlashing] = useState(false)
+  const [autoShoot, setAutoShoot] = useState(true)
   const countdownRef = useRef(null)
 
   const totalShots = format.photoCount
@@ -19,24 +20,34 @@ export default function CameraStep({ format, photos, onPhotosChange, onNext, onB
     }
   }, [])
 
-  const shoot = useCallback(() => {
-    if (countdown !== null || allDone) return
-    let remaining = timerDuration
-    setCountdown(remaining)
+  function runCapture(taken, auto, duration) {
+    let count = duration
+    setCountdown(count)
     countdownRef.current = setInterval(() => {
-      remaining -= 1
-      if (remaining <= 0) {
+      count -= 1
+      if (count <= 0) {
         clearInterval(countdownRef.current)
         setCountdown(null)
         setFlashing(true)
         setTimeout(() => setFlashing(false), 150)
         const dataUrl = capture()
-        if (dataUrl) onPhotosChange(prev => [...prev, dataUrl])
+        if (dataUrl) {
+          const newCount = taken + 1
+          onPhotosChange(prev => [...prev, dataUrl])
+          if (auto && newCount < totalShots) {
+            setTimeout(() => runCapture(newCount, auto, duration), 800)
+          }
+        }
       } else {
-        setCountdown(remaining)
+        setCountdown(count)
       }
     }, 1000)
-  }, [countdown, allDone, timerDuration, capture, onPhotosChange])
+  }
+
+  function shoot() {
+    if (countdown !== null || allDone) return
+    runCapture(photos.length, autoShoot, timerDuration)
+  }
 
   function retake(index) {
     if (countdownRef.current) clearInterval(countdownRef.current)
@@ -44,10 +55,18 @@ export default function CameraStep({ format, photos, onPhotosChange, onNext, onB
     onPhotosChange(prev => prev.filter((_, i) => i !== index))
   }
 
+  const FlipIcon = () => (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M1 4v6h6M23 20v-6h-6"/>
+      <path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4-4.64 4.36A9 9 0 0 1 3.51 15"/>
+    </svg>
+  )
+
   return (
     <div className="flex h-full">
       <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Top bar — h-16 matches sidebar header */}
+
+        {/* Top bar */}
         <div className="h-16 flex items-center justify-between px-6 border-b border-[#e5e0d8] bg-white shrink-0">
           <div className="flex items-center gap-3">
             <button
@@ -62,7 +81,41 @@ export default function CameraStep({ format, photos, onPhotosChange, onNext, onB
             <span className="text-[#d5cfc8] select-none">|</span>
             <h2 className="font-medium text-[#1a1614]">Camera</h2>
           </div>
+
           <div className="flex items-center gap-3">
+            {/* Auto / Manual toggle */}
+            <button
+              onClick={() => setAutoShoot(a => !a)}
+              title={autoShoot
+                ? 'Auto: one click captures all photos in sequence'
+                : 'Manual: click Shoot once per photo'}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border transition-colors ${
+                autoShoot
+                  ? 'bg-[#8B3714] text-white border-[#8B3714]'
+                  : 'bg-white text-[#7a6f68] border-[#d5cfc8] hover:border-[#8B3714] hover:text-[#8B3714]'
+              }`}
+            >
+              {autoShoot ? (
+                <>
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor">
+                    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+                  </svg>
+                  Auto
+                </>
+              ) : (
+                <>
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="12" cy="12" r="10"/>
+                    <circle cx="12" cy="12" r="3" fill="currentColor" stroke="none"/>
+                  </svg>
+                  Manual
+                </>
+              )}
+            </button>
+
+            <span className="text-[#d5cfc8] select-none">|</span>
+
+            {/* Timer */}
             <span className="text-sm text-[#7a6f68]">Timer</span>
             {[3, 5, 10].map(t => (
               <button
@@ -130,22 +183,11 @@ export default function CameraStep({ format, photos, onPhotosChange, onNext, onB
                 <p className="text-red-400 text-sm text-center">{error}</p>
               </div>
             )}
-
-            <button
-              onClick={flipCamera}
-              className="absolute top-3 right-3 w-8 h-8 bg-black/40 rounded-full flex items-center justify-center text-white hover:bg-black/60 transition-colors"
-              title="Flip camera"
-            >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M1 4v6h6M23 20v-6h-6"/>
-                <path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4-4.64 4.36A9 9 0 0 1 3.51 15"/>
-              </svg>
-            </button>
           </div>
         </div>
 
-        {/* Shoot / Continue */}
-        <div className="flex flex-col items-center gap-2 pb-5 shrink-0">
+        {/* Bottom controls */}
+        <div className="flex items-end justify-center gap-8 pb-5 shrink-0">
           {allDone ? (
             <button
               onClick={onNext}
@@ -155,14 +197,29 @@ export default function CameraStep({ format, photos, onPhotosChange, onNext, onB
             </button>
           ) : (
             <>
+              {/* Flip camera — left of shoot button */}
               <button
-                onClick={shoot}
-                disabled={!ready || countdown !== null}
-                className="w-16 h-16 rounded-full border-4 border-[#8B3714] bg-white flex items-center justify-center hover:bg-[#f5f0ea] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                onClick={flipCamera}
+                className="w-12 h-12 mb-1 rounded-full border-2 border-[#d5cfc8] bg-white flex items-center justify-center text-[#7a6f68] hover:border-[#8B3714] hover:text-[#8B3714] transition-colors"
+                title="Flip camera"
               >
-                <div className="w-9 h-9 rounded-full bg-[#8B3714]" />
+                <FlipIcon />
               </button>
-              <span className="text-sm text-[#7a6f68]">Shoot</span>
+
+              {/* Shoot */}
+              <div className="flex flex-col items-center gap-1.5">
+                <button
+                  onClick={shoot}
+                  disabled={!ready || countdown !== null}
+                  className="w-16 h-16 rounded-full border-4 border-[#8B3714] bg-white flex items-center justify-center hover:bg-[#f5f0ea] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                  <div className="w-9 h-9 rounded-full bg-[#8B3714]" />
+                </button>
+                <span className="text-sm text-[#7a6f68]">Shoot</span>
+              </div>
+
+              {/* Spacer for visual symmetry */}
+              <div className="w-12 mb-1" />
             </>
           )}
         </div>
@@ -184,7 +241,7 @@ export default function CameraStep({ format, photos, onPhotosChange, onNext, onB
                     <img src={photo} alt={`Shot ${i + 1}`} className="w-full h-full object-cover" />
                     <button
                       onClick={() => retake(i)}
-                      title="Retake"
+                      title="Remove"
                       className="absolute top-1 right-1 w-5 h-5 bg-black/50 rounded-full flex items-center justify-center text-white text-xs leading-none hover:bg-black/70 transition-colors"
                     >
                       ×

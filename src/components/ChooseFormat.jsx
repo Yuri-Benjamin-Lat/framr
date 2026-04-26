@@ -36,11 +36,11 @@ function FormatIcon({ layout }) {
       )
     case 'mixed-narrative':
       return (
-        <svg width="54" height="46" viewBox="0 0 54 46" fill="none">
-          <rect x="2" y="2" width="28" height="42" fill="#d5cfc8" rx="2"/>
-          <rect x="34" y="2" width="18" height="12" fill="#d5cfc8" rx="2"/>
-          <rect x="34" y="17" width="18" height="12" fill="#d5cfc8" rx="2"/>
-          <rect x="34" y="32" width="18" height="12" fill="#d5cfc8" rx="2"/>
+        <svg width="56" height="46" viewBox="0 0 56 46" fill="none">
+          <rect x="2" y="2" width="52" height="22" fill="#d5cfc8" rx="2"/>
+          <rect x="2" y="28" width="15" height="16" fill="#d5cfc8" rx="2"/>
+          <rect x="20.5" y="28" width="15" height="16" fill="#d5cfc8" rx="2"/>
+          <rect x="39" y="28" width="15" height="16" fill="#d5cfc8" rx="2"/>
         </svg>
       )
     default:
