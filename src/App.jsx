@@ -1,122 +1,67 @@
 import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import { FORMATS, FILTERS, FRAME_COLORS } from './data/formats'
+import Sidebar from './components/Sidebar'
+import ChooseFormat from './components/ChooseFormat'
+import CameraStep from './components/CameraStep'
+import CustomizeStep from './components/CustomizeStep'
+import SaveShareStep from './components/SaveShareStep'
 
-function App() {
-  const [count, setCount] = useState(0)
+export default function App() {
+  const [step, setStep] = useState(1)
+  const [format, setFormat] = useState(FORMATS[0])
+  const [photos, setPhotos] = useState([])
+  const [filter, setFilter] = useState(FILTERS[0])
+  const [frameColor, setFrameColor] = useState(FRAME_COLORS[0])
+
+  function goNext() { setStep(s => Math.min(s + 1, 4)) }
+  function goBack() { setStep(s => Math.max(s - 1, 1)) }
+
+  function restart() {
+    setStep(1)
+    setPhotos([])
+    setFilter(FILTERS[0])
+    setFrameColor(FRAME_COLORS[0])
+    setFormat(FORMATS[0])
+  }
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
-
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
+    <div className="flex h-screen overflow-hidden bg-[#f5f0ea]">
+      <Sidebar step={step} />
+      <main className="flex-1 overflow-hidden">
+        {step === 1 && (
+          <ChooseFormat format={format} onSelect={setFormat} onNext={goNext} />
+        )}
+        {step === 2 && (
+          <CameraStep
+            format={format}
+            photos={photos}
+            onPhotosChange={setPhotos}
+            onNext={goNext}
+            onBack={goBack}
+          />
+        )}
+        {step === 3 && (
+          <CustomizeStep
+            format={format}
+            photos={photos}
+            filter={filter}
+            frameColor={frameColor}
+            onFilterChange={setFilter}
+            onFrameColorChange={setFrameColor}
+            onNext={goNext}
+            onBack={goBack}
+          />
+        )}
+        {step === 4 && (
+          <SaveShareStep
+            format={format}
+            photos={photos}
+            filter={filter}
+            frameColor={frameColor}
+            onRestart={restart}
+          />
+        )}
+      </main>
+    </div>
   )
 }
-
-export default App
