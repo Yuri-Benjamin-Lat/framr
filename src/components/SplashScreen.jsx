@@ -95,7 +95,7 @@ export default function SplashScreen({ onDone }) {
 
         {/* Wordmark */}
         <span
-          className="text-5xl md:text-6xl font-bold"
+          className="text-5xl md:text-6xl font-bold font-display"
           style={{ color: '#f5f0ea', letterSpacing: '-0.02em' }}
         >
           framr

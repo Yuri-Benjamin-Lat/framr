@@ -66,7 +66,7 @@ export default function Sidebar({ step, isDark, toggleDark }) {
       <aside className="hidden lg:flex w-64 shrink-0 bg-white dark:bg-[#1a1210] border-r border-[#e5e0d8] dark:border-[#3d2f2b] flex-col">
         <div className="h-16 px-6 border-b border-[#e5e0d8] dark:border-[#3d2f2b] flex items-center gap-2 shrink-0">
           <Logo />
-          <span className="font-semibold text-[#1a1614] dark:text-[#ede8e0] text-lg tracking-tight">framr</span>
+          <span className="font-display font-semibold text-[#1a1614] dark:text-[#ede8e0] text-xl tracking-tight">framr</span>
           <ThemeBtn extraClass="ml-auto" />
         </div>
         <nav className="p-6 flex flex-col">
