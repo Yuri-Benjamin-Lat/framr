@@ -45,19 +45,19 @@ function PrintPreview({ format, photos, filter, frameColor, onPhotosChange }) {
       preview = <div style={{ background: bg, padding: '22px 22px 68px', boxShadow: shadow, display: 'inline-block' }}>{slot(photos[0], 340, 340, 0)}</div>
       break
     case 'vertical-strip':
-      preview = <div style={{ background: bg, padding: 16, display: 'inline-flex', flexDirection: 'column', gap: 8, boxShadow: shadow }}>{photos.map((p, i) => slot(p, 300, 200, i))}</div>
+      preview = <div style={{ background: bg, padding: '16px 16px 50px', display: 'inline-flex', flexDirection: 'column', gap: 8, boxShadow: shadow }}>{photos.map((p, i) => slot(p, 300, 200, i))}</div>
       break
     case 'landscape-sequence':
-      preview = <div style={{ background: bg, padding: 16, display: 'inline-flex', flexDirection: 'row', gap: 8, boxShadow: shadow }}>{photos.map((p, i) => slot(p, 210, 158, i))}</div>
+      preview = <div style={{ background: bg, padding: '16px 16px 32px', display: 'inline-flex', flexDirection: 'row', gap: 8, boxShadow: shadow }}>{photos.map((p, i) => slot(p, 210, 158, i))}</div>
       break
     case 'modern-grid':
-      preview = <div style={{ background: bg, padding: 16, display: 'inline-grid', gridTemplateColumns: '1fr 1fr', gap: 8, boxShadow: shadow }}>{photos.map((p, i) => slot(p, 210, 158, i))}</div>
+      preview = <div style={{ background: bg, padding: '16px 16px 50px', display: 'inline-grid', gridTemplateColumns: '1fr 1fr', gap: 8, boxShadow: shadow }}>{photos.map((p, i) => slot(p, 210, 158, i))}</div>
       break
     case 'mixed-narrative': {
       const topW = 500, topH = Math.round(topW * 9 / 16), gap = 8
       const bottomW = Math.round((topW - gap * 2) / 3), bottomH = Math.round(bottomW * 3 / 4)
       preview = (
-        <div style={{ background: bg, padding: 16, display: 'inline-flex', flexDirection: 'column', gap: 8, boxShadow: shadow }}>
+        <div style={{ background: bg, padding: '16px 16px 50px', display: 'inline-flex', flexDirection: 'column', gap: 8, boxShadow: shadow }}>
           {slot(photos[0], topW, topH, 0)}
           <div style={{ display: 'flex', flexDirection: 'row', gap: 8 }}>{photos.slice(1).map((p, i) => slot(p, bottomW, bottomH, i + 1))}</div>
         </div>
