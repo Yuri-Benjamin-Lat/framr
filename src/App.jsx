@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { FORMATS, FILTERS, FRAME_COLORS } from './data/formats'
 import Sidebar from './components/Sidebar'
 import ChooseFormat from './components/ChooseFormat'
@@ -14,11 +14,16 @@ export default function App() {
   const [photos, setPhotos] = useState([])
   const [filter, setFilter] = useState(FILTERS[0])
   const [frameColor, setFrameColor] = useState(FRAME_COLORS[0])
-  const [isDark, setIsDark] = useState(false)
+  const [isDark, setIsDark] = useState(() => localStorage.getItem('theme') === 'dark')
+
+  useEffect(() => {
+    document.documentElement.classList.toggle('dark', isDark)
+  }, [isDark])
 
   function toggleDark() {
     setIsDark(d => {
       const next = !d
+      localStorage.setItem('theme', next ? 'dark' : 'light')
       document.documentElement.classList.toggle('dark', next)
       return next
     })
