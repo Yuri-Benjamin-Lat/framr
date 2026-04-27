@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import { compositePhoto } from '../utils/canvas'
 
+const PRIVACY_NOTE = "framr doesn't store, upload, or see your photos. All processing happens directly in your browser — nothing is sent to any server."
+
 export default function SaveShareStep({ format, photos, filter, frameColor, onRestart, onBack }) {
   const [outputUrl, setOutputUrl] = useState(null)
   const [generating, setGenerating] = useState(true)
@@ -38,7 +40,7 @@ export default function SaveShareStep({ format, photos, filter, frameColor, onRe
 
   function print() {
     const win = window.open('', '_blank')
-    win.document.write(`<html><head><title>Framr</title><style>body{margin:0;display:flex;justify-content:center;align-items:center;min-height:100vh;background:#fff;}img{max-width:100%;max-height:100vh;object-fit:contain;}</style></head><body><img src="${outputUrl}" onload="window.print();window.close();" /></body></html>`)
+    win.document.write(`<html><head><title>framr</title><style>body{margin:0;display:flex;justify-content:center;align-items:center;min-height:100vh;background:#fff;}img{max-width:100%;max-height:100vh;object-fit:contain;}</style></head><body><img src="${outputUrl}" onload="window.print();window.close();" /></body></html>`)
     win.document.close()
   }
 
@@ -47,7 +49,7 @@ export default function SaveShareStep({ format, photos, filter, frameColor, onRe
     try {
       const blob = await (await fetch(outputUrl)).blob()
       const file = new File([blob], `framr-${format.id}.png`, { type: 'image/png' })
-      await navigator.share({ files: [file], title: 'Framr', text: `My ${format.name}` })
+      await navigator.share({ files: [file], title: 'framr', text: `My ${format.name}` })
     } catch (_) {}
   }
 
@@ -143,6 +145,11 @@ export default function SaveShareStep({ format, photos, filter, frameColor, onRe
               ← Start a new strip
             </button>
           </div>
+
+          {/* Privacy note */}
+          <p className="text-[10px] text-[#b0a898] dark:text-[#5c4f4a] leading-relaxed pt-1 border-t border-[#e5e0d8] dark:border-[#3d2f2b]">
+            {PRIVACY_NOTE}
+          </p>
         </div>
       </div>
     </div>

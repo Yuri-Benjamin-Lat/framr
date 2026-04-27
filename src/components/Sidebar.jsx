@@ -34,25 +34,26 @@ function SunIcon() {
   return (
     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
       <circle cx="12" cy="12" r="5"/>
-      <line x1="12" y1="1"  x2="12" y2="3"/>
+      <line x1="12" y1="1" x2="12" y2="3"/>
       <line x1="12" y1="21" x2="12" y2="23"/>
-      <line x1="4.22"  y1="4.22"  x2="5.64"  y2="5.64"/>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
       <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
-      <line x1="1"  y1="12" x2="3"  y2="12"/>
+      <line x1="1" y1="12" x2="3" y2="12"/>
       <line x1="21" y1="12" x2="23" y2="12"/>
-      <line x1="4.22"  y1="19.78" x2="5.64"  y2="18.36"/>
-      <line x1="18.36" y1="5.64"  x2="19.78" y2="4.22"/>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
     </svg>
   )
 }
+
+const PRIVACY_NOTE = "framr doesn't store, upload, or see your photos. All processing happens directly in your browser — nothing is sent to any server."
 
 export default function Sidebar({ step, isDark, toggleDark }) {
   function ThemeBtn({ extraClass = '' }) {
     return (
       <button
         onClick={toggleDark}
-        title={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
-        className={`w-8 h-8 rounded-full flex items-center justify-center text-[#7a6f68] dark:text-[#8c7e78] hover:bg-[#f0ece6] dark:hover:bg-[#2c2220] transition-colors ${extraClass}`}
+        className={`w-8 h-8 rounded-full flex items-center justify-center bg-[#ede5db] dark:bg-[#2c2220] text-[#7a6f68] dark:text-[#8c7e78] hover:bg-[#e0d5c8] dark:hover:bg-[#352825] transition-colors ${extraClass}`}
       >
         {isDark ? <SunIcon /> : <MoonIcon />}
       </button>
@@ -61,8 +62,8 @@ export default function Sidebar({ step, isDark, toggleDark }) {
 
   return (
     <>
-      {/* ── Desktop sidebar (lg+) ── */}
-      <aside className="hidden lg:flex w-64 shrink-0 bg-white dark:bg-[#221a18] border-r border-[#e5e0d8] dark:border-[#3d2f2b] flex-col">
+      {/* ── Desktop: full sidebar (lg+) ── */}
+      <aside className="hidden lg:flex w-64 shrink-0 bg-white dark:bg-[#1a1210] border-r border-[#e5e0d8] dark:border-[#3d2f2b] flex-col">
         <div className="h-16 px-6 border-b border-[#e5e0d8] dark:border-[#3d2f2b] flex items-center gap-2 shrink-0">
           <Logo />
           <span className="font-semibold text-[#1a1614] dark:text-[#ede8e0] text-lg tracking-tight">framr</span>
@@ -76,9 +77,7 @@ export default function Sidebar({ step, isDark, toggleDark }) {
               <div key={s.num} className="flex gap-3 items-start">
                 <div className="flex flex-col items-center">
                   <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium shrink-0 transition-colors ${
-                    done || active
-                      ? 'bg-[#8B3714] text-white'
-                      : 'border-2 border-[#d5cfc8] dark:border-[#4a3a36] text-[#7a6f68] dark:text-[#8c7e78]'
+                    done || active ? 'bg-[#8B3714] text-white' : 'border-2 border-[#d5cfc8] dark:border-[#3d2f2b] text-[#7a6f68] dark:text-[#5c4f4a]'
                   }`}>
                     {done ? <CheckIcon /> : s.num}
                   </div>
@@ -87,21 +86,24 @@ export default function Sidebar({ step, isDark, toggleDark }) {
                   )}
                 </div>
                 <div className={`pt-1 ${i < STEPS.length - 1 ? 'pb-7' : ''}`}>
-                  <p className={`text-sm font-medium leading-none ${active ? 'text-[#1a1614] dark:text-[#ede8e0]' : 'text-[#7a6f68] dark:text-[#8c7e78]'}`}>
+                  <p className={`text-sm font-medium leading-none ${active ? 'text-[#1a1614] dark:text-[#ede8e0]' : 'text-[#7a6f68] dark:text-[#5c4f4a]'}`}>
                     {s.label}
                   </p>
                   {active && (
-                    <p className="text-xs text-[#8B3714] dark:text-[#c4643a] mt-1.5">{s.sub}</p>
+                    <p className="text-xs text-[#8B3714] mt-1.5">{s.sub}</p>
                   )}
                 </div>
               </div>
             )
           })}
         </nav>
+        <div className="mt-auto p-5 border-t border-[#e5e0d8] dark:border-[#3d2f2b]">
+          <p className="text-[10px] text-[#b0a898] dark:text-[#5c4f4a] leading-relaxed">{PRIVACY_NOTE}</p>
+        </div>
       </aside>
 
-      {/* ── Tablet icon rail (md–lg) ── */}
-      <aside className="hidden md:flex lg:hidden w-16 shrink-0 bg-white dark:bg-[#221a18] border-r border-[#e5e0d8] dark:border-[#3d2f2b] flex-col">
+      {/* ── Tablet: icon rail (md–lg) ── */}
+      <aside className="hidden md:flex lg:hidden w-16 shrink-0 bg-white dark:bg-[#1a1210] border-r border-[#e5e0d8] dark:border-[#3d2f2b] flex-col">
         <div className="h-16 border-b border-[#e5e0d8] dark:border-[#3d2f2b] flex items-center justify-center shrink-0">
           <Logo />
         </div>
@@ -114,14 +116,12 @@ export default function Sidebar({ step, isDark, toggleDark }) {
                 <div
                   title={s.label}
                   className={`w-9 h-9 rounded-full flex items-center justify-center text-sm font-medium transition-colors ${
-                    done || active
-                      ? 'bg-[#8B3714] text-white'
-                      : 'border-2 border-[#d5cfc8] dark:border-[#4a3a36] text-[#7a6f68] dark:text-[#8c7e78]'
+                    done || active ? 'bg-[#8B3714] text-white' : 'border-2 border-[#d5cfc8] dark:border-[#3d2f2b] text-[#7a6f68] dark:text-[#5c4f4a]'
                   }`}
                 >
                   {done ? <CheckIcon /> : s.num}
                 </div>
-                <span className={`text-[9px] leading-none text-center ${active ? 'text-[#8B3714] dark:text-[#c4643a] font-semibold' : 'text-[#b0a898] dark:text-[#5a4e48]'}`}>
+                <span className={`text-[9px] leading-none text-center ${active ? 'text-[#8B3714] font-semibold' : 'text-[#b0a898] dark:text-[#5c4f4a]'}`}>
                   {s.short}
                 </span>
               </div>
@@ -133,21 +133,19 @@ export default function Sidebar({ step, isDark, toggleDark }) {
         </div>
       </aside>
 
-      {/* ── Mobile bottom tab bar ── */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white dark:bg-[#221a18] border-t border-[#e5e0d8] dark:border-[#3d2f2b] flex">
+      {/* ── Mobile: bottom tab bar (< md) ── */}
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white dark:bg-[#1a1210] border-t border-[#e5e0d8] dark:border-[#3d2f2b] flex safe-bottom">
         {STEPS.map((s) => {
           const done = step > s.num
           const active = step === s.num
           return (
             <div key={s.num} className="flex-1 flex flex-col items-center justify-center py-2 gap-1">
               <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-semibold transition-colors ${
-                done || active
-                  ? 'bg-[#8B3714] text-white'
-                  : 'border border-[#d5cfc8] dark:border-[#4a3a36] text-[#b0a898] dark:text-[#5a4e48]'
+                done || active ? 'bg-[#8B3714] text-white' : 'border border-[#d5cfc8] dark:border-[#3d2f2b] text-[#b0a898] dark:text-[#5c4f4a]'
               }`}>
                 {done ? <CheckIcon /> : s.num}
               </div>
-              <span className={`text-[10px] leading-none ${active ? 'text-[#8B3714] dark:text-[#c4643a] font-semibold' : 'text-[#b0a898] dark:text-[#5a4e48]'}`}>
+              <span className={`text-[10px] leading-none ${active ? 'text-[#8B3714] font-semibold' : 'text-[#b0a898] dark:text-[#5c4f4a]'}`}>
                 {s.short}
               </span>
             </div>
@@ -155,11 +153,10 @@ export default function Sidebar({ step, isDark, toggleDark }) {
         })}
       </nav>
 
-      {/* Mobile: floating theme toggle top-right */}
+      {/* Mobile theme toggle */}
       <button
         onClick={toggleDark}
-        title={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
-        className="md:hidden fixed top-3 right-3 z-40 w-9 h-9 rounded-full bg-white dark:bg-[#221a18] border border-[#e5e0d8] dark:border-[#3d2f2b] flex items-center justify-center text-[#7a6f68] dark:text-[#8c7e78] shadow-sm transition-colors"
+        className="md:hidden fixed top-3 right-3 z-40 w-9 h-9 rounded-full flex items-center justify-center bg-white dark:bg-[#2c2220] border border-[#e5e0d8] dark:border-[#3d2f2b] text-[#7a6f68] dark:text-[#8c7e78] shadow-sm"
       >
         {isDark ? <SunIcon /> : <MoonIcon />}
       </button>

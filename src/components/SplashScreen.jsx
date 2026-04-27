@@ -98,7 +98,7 @@ export default function SplashScreen({ onDone }) {
           className="text-5xl md:text-6xl font-bold"
           style={{ color: '#f5f0ea', letterSpacing: '-0.02em' }}
         >
-          Framr
+          framr
         </span>
       </div>
 
