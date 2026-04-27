@@ -57,8 +57,8 @@ export default function CameraStep({ format, photos, onPhotosChange, onNext, onB
 
   const FlipIcon = () => (
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M1 4v6h6M23 20v-6h-6"/>
-      <path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4-4.64 4.36A9 9 0 0 1 3.51 15"/>
+      <path d="M1 4v6h6M23 20v-6h-6" />
+      <path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4-4.64 4.36A9 9 0 0 1 3.51 15" />
     </svg>
   )
 
@@ -74,7 +74,7 @@ export default function CameraStep({ format, photos, onPhotosChange, onNext, onB
               className="flex items-center gap-1.5 text-sm text-[#7a6f68] hover:text-[#1a1614] transition-colors"
             >
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M19 12H5M12 19l-7-7 7-7"/>
+                <path d="M19 12H5M12 19l-7-7 7-7" />
               </svg>
               Back
             </button>
@@ -89,24 +89,26 @@ export default function CameraStep({ format, photos, onPhotosChange, onNext, onB
               title={autoShoot
                 ? 'Auto: one click captures all photos in sequence'
                 : 'Manual: click Shoot once per photo'}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border transition-colors ${
-                autoShoot
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border transition-colors ${autoShoot
                   ? 'bg-[#8B3714] text-white border-[#8B3714]'
                   : 'bg-white text-[#7a6f68] border-[#d5cfc8] hover:border-[#8B3714] hover:text-[#8B3714]'
-              }`}
+                }`}
             >
               {autoShoot ? (
                 <>
-                  <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor">
-                    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+                  {/* Stacked frames = sequential multi-shot */}
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <rect x="2" y="9" width="11" height="9" rx="1.5" strokeOpacity="0.35" />
+                    <rect x="5.5" y="6" width="11" height="9" rx="1.5" strokeOpacity="0.65" />
+                    <rect x="9" y="3" width="11" height="9" rx="1.5" />
                   </svg>
                   Auto
                 </>
               ) : (
                 <>
                   <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                    <circle cx="12" cy="12" r="10"/>
-                    <circle cx="12" cy="12" r="3" fill="currentColor" stroke="none"/>
+                    <circle cx="12" cy="12" r="10" />
+                    <circle cx="12" cy="12" r="3" fill="currentColor" stroke="none" />
                   </svg>
                   Manual
                 </>
@@ -121,11 +123,10 @@ export default function CameraStep({ format, photos, onPhotosChange, onNext, onB
               <button
                 key={t}
                 onClick={() => setTimerDuration(t)}
-                className={`w-9 h-9 rounded-full text-sm font-medium transition-colors ${
-                  timerDuration === t
+                className={`w-9 h-9 rounded-full text-sm font-medium transition-colors ${timerDuration === t
                     ? 'bg-[#8B3714] text-white'
                     : 'bg-[#f0ece6] text-[#7a6f68] hover:bg-[#e5e0d8]'
-                }`}
+                  }`}
               >
                 {t}s
               </button>
@@ -187,7 +188,7 @@ export default function CameraStep({ format, photos, onPhotosChange, onNext, onB
         </div>
 
         {/* Bottom controls */}
-        <div className="flex items-end justify-center gap-8 pb-5 shrink-0">
+        <div className="flex items-center justify-center gap-8 pb-5 shrink-0">
           {allDone ? (
             <button
               onClick={onNext}
@@ -197,16 +198,17 @@ export default function CameraStep({ format, photos, onPhotosChange, onNext, onB
             </button>
           ) : (
             <>
-              {/* Flip camera — left of shoot button */}
-              <button
-                onClick={flipCamera}
-                className="w-12 h-12 mb-1 rounded-full border-2 border-[#d5cfc8] bg-white flex items-center justify-center text-[#7a6f68] hover:border-[#8B3714] hover:text-[#8B3714] transition-colors"
-                title="Flip camera"
-              >
-                <FlipIcon />
-              </button>
+              <div className="flex flex-col items-center gap-1.5">
+                <button
+                  onClick={flipCamera}
+                  className="w-12 h-12 rounded-full border-2 border-[#d5cfc8] bg-white flex items-center justify-center text-[#7a6f68] hover:border-[#8B3714] hover:text-[#8B3714] transition-colors"
+                  title="Flip camera"
+                >
+                  <FlipIcon />
+                </button>
+                <span className="text-sm opacity-0 select-none" aria-hidden="true">·</span>
+              </div>
 
-              {/* Shoot */}
               <div className="flex flex-col items-center gap-1.5">
                 <button
                   onClick={shoot}
@@ -218,8 +220,10 @@ export default function CameraStep({ format, photos, onPhotosChange, onNext, onB
                 <span className="text-sm text-[#7a6f68]">Shoot</span>
               </div>
 
-              {/* Spacer for visual symmetry */}
-              <div className="w-12 mb-1" />
+              <div className="flex flex-col items-center gap-1.5">
+                <div className="w-12 h-12" />
+                <span className="text-sm opacity-0 select-none" aria-hidden="true">·</span>
+              </div>
             </>
           )}
         </div>
@@ -248,7 +252,7 @@ export default function CameraStep({ format, photos, onPhotosChange, onNext, onB
                     </button>
                     <div className="absolute bottom-1 left-1.5">
                       <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#8B3714" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                        <polyline points="20 6 9 17 4 12"/>
+                        <polyline points="20 6 9 17 4 12" />
                       </svg>
                     </div>
                   </>
