@@ -134,7 +134,7 @@ export default function Sidebar({ step, isDark, toggleDark }) {
       </aside>
 
       {/* ── Mobile: bottom tab bar (< md) ── */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white dark:bg-[#1a1210] border-t border-[#e5e0d8] dark:border-[#3d2f2b] flex safe-bottom">
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white dark:bg-[#1a1210] border-t border-[#e5e0d8] dark:border-[#3d2f2b] flex items-stretch safe-bottom">
         {STEPS.map((s) => {
           const done = step > s.num
           const active = step === s.num
@@ -151,15 +151,18 @@ export default function Sidebar({ step, isDark, toggleDark }) {
             </div>
           )
         })}
-      </nav>
 
-      {/* Mobile theme toggle */}
-      <button
-        onClick={toggleDark}
-        className="md:hidden fixed top-3 right-3 z-40 w-9 h-9 rounded-full flex items-center justify-center bg-white dark:bg-[#2c2220] border border-[#e5e0d8] dark:border-[#3d2f2b] text-[#7a6f68] dark:text-[#8c7e78] shadow-sm"
-      >
-        {isDark ? <SunIcon /> : <MoonIcon />}
-      </button>
+        {/* Theme toggle as 5th item */}
+        <div className="w-12 flex flex-col items-center justify-center py-2 gap-1 border-l border-[#e5e0d8] dark:border-[#3d2f2b]">
+          <button
+            onClick={toggleDark}
+            className="w-7 h-7 rounded-full flex items-center justify-center text-[#7a6f68] dark:text-[#8c7e78] hover:bg-[#f5f0ea] dark:hover:bg-[#2c2220] transition-colors"
+          >
+            {isDark ? <SunIcon /> : <MoonIcon />}
+          </button>
+          <span className="text-[10px] leading-none text-[#b0a898] dark:text-[#5c4f4a]">Theme</span>
+        </div>
+      </nav>
     </>
   )
 }
