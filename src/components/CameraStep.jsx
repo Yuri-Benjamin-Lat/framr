@@ -57,8 +57,8 @@ export default function CameraStep({ format, photos, onPhotosChange, onNext, onB
 
   const FlipIcon = () => (
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M1 4v6h6M23 20v-6h-6" />
-      <path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4-4.64 4.36A9 9 0 0 1 3.51 15" />
+      <path d="M1 4v6h6M23 20v-6h-6"/>
+      <path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4-4.64 4.36A9 9 0 0 1 3.51 15"/>
     </svg>
   )
 
@@ -67,66 +67,66 @@ export default function CameraStep({ format, photos, onPhotosChange, onNext, onB
       <div className="flex-1 flex flex-col overflow-hidden">
 
         {/* Top bar */}
-        <div className="h-16 flex items-center justify-between px-6 border-b border-[#e5e0d8] bg-white shrink-0">
-          <div className="flex items-center gap-3">
+        <div className="h-14 md:h-16 flex items-center justify-between px-3 md:px-6 border-b border-[#e5e0d8] bg-white shrink-0 gap-2">
+          <div className="flex items-center gap-2 md:gap-3 shrink-0">
             <button
               onClick={onBack}
-              className="flex items-center gap-1.5 text-sm text-[#7a6f68] hover:text-[#1a1614] transition-colors"
+              className="flex items-center gap-1 md:gap-1.5 text-sm text-[#7a6f68] hover:text-[#1a1614] transition-colors"
             >
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M19 12H5M12 19l-7-7 7-7" />
+                <path d="M19 12H5M12 19l-7-7 7-7"/>
               </svg>
-              Back
+              <span className="hidden sm:inline">Back</span>
             </button>
-            <span className="text-[#d5cfc8] select-none">|</span>
-            <h2 className="font-medium text-[#1a1614]">Camera</h2>
+            <span className="text-[#d5cfc8] select-none hidden sm:inline">|</span>
+            <h2 className="font-medium text-[#1a1614] text-sm md:text-base">Camera</h2>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-1.5 md:gap-3">
             {/* Auto / Manual toggle */}
             <button
               onClick={() => setAutoShoot(a => !a)}
-              title={autoShoot
-                ? 'Auto: one click captures all photos in sequence'
-                : 'Manual: click Shoot once per photo'}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border transition-colors ${autoShoot
+              title={autoShoot ? 'Auto: captures all shots in sequence' : 'Manual: one shot per tap'}
+              className={`flex items-center gap-1 md:gap-1.5 px-2 md:px-3 py-1.5 rounded-lg text-xs font-semibold border transition-colors ${
+                autoShoot
                   ? 'bg-[#8B3714] text-white border-[#8B3714]'
                   : 'bg-white text-[#7a6f68] border-[#d5cfc8] hover:border-[#8B3714] hover:text-[#8B3714]'
-                }`}
+              }`}
             >
               {autoShoot ? (
                 <>
-                  {/* Stacked frames = sequential multi-shot */}
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <rect x="2" y="9" width="11" height="9" rx="1.5" strokeOpacity="0.35" />
-                    <rect x="5.5" y="6" width="11" height="9" rx="1.5" strokeOpacity="0.65" />
-                    <rect x="9" y="3" width="11" height="9" rx="1.5" />
+                    <rect x="2" y="9" width="11" height="9" rx="1.5" strokeOpacity="0.35"/>
+                    <rect x="5.5" y="6" width="11" height="9" rx="1.5" strokeOpacity="0.65"/>
+                    <rect x="9" y="3" width="11" height="9" rx="1.5"/>
                   </svg>
                   Auto
                 </>
               ) : (
                 <>
                   <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                    <circle cx="12" cy="12" r="10" />
-                    <circle cx="12" cy="12" r="3" fill="currentColor" stroke="none" />
+                    <circle cx="12" cy="12" r="10"/>
+                    <circle cx="12" cy="12" r="3" fill="currentColor" stroke="none"/>
                   </svg>
                   Manual
                 </>
               )}
             </button>
 
-            <span className="text-[#d5cfc8] select-none">|</span>
+            <span className="text-[#d5cfc8] select-none hidden sm:inline">|</span>
 
-            {/* Timer */}
-            <span className="text-sm text-[#7a6f68]">Timer</span>
+            {/* Timer label — hidden on small screens to save space */}
+            <span className="text-sm text-[#7a6f68] hidden sm:block">Timer</span>
+
             {[3, 5, 10].map(t => (
               <button
                 key={t}
                 onClick={() => setTimerDuration(t)}
-                className={`w-9 h-9 rounded-full text-sm font-medium transition-colors ${timerDuration === t
+                className={`w-8 h-8 rounded-full text-xs md:text-sm font-medium transition-colors ${
+                  timerDuration === t
                     ? 'bg-[#8B3714] text-white'
                     : 'bg-[#f0ece6] text-[#7a6f68] hover:bg-[#e5e0d8]'
-                  }`}
+                }`}
               >
                 {t}s
               </button>
@@ -135,7 +135,7 @@ export default function CameraStep({ format, photos, onPhotosChange, onNext, onB
         </div>
 
         {/* Viewfinder */}
-        <div className="flex-1 flex items-center justify-center px-8 py-4 bg-[#f5f0ea]">
+        <div className="flex-1 flex items-center justify-center px-3 py-2 md:px-8 md:py-4 bg-[#f5f0ea]">
           <div className="relative w-full max-w-4xl aspect-video bg-black rounded-lg overflow-hidden">
             <video
               ref={videoRef}
@@ -169,7 +169,7 @@ export default function CameraStep({ format, photos, onPhotosChange, onNext, onB
 
             {countdown !== null && (
               <div className="absolute inset-0 flex items-center justify-center bg-black/20">
-                <span className="text-white text-8xl font-bold drop-shadow-lg select-none">{countdown}</span>
+                <span className="text-white text-7xl md:text-8xl font-bold drop-shadow-lg select-none">{countdown}</span>
               </div>
             )}
 
@@ -187,12 +187,44 @@ export default function CameraStep({ format, photos, onPhotosChange, onNext, onB
           </div>
         </div>
 
+        {/* Mobile thumbnail strip — replaces the right panel on small screens */}
+        <div className="md:hidden shrink-0 bg-[#f5f0ea] border-t border-[#e5e0d8] px-3 py-2 flex items-center gap-2 overflow-x-auto">
+          {Array.from({ length: totalShots }).map((_, i) => {
+            const photo = photos[i]
+            return (
+              <div key={i} className="relative w-16 h-12 shrink-0 rounded-md overflow-hidden bg-[#e5e0d8] border border-[#d5cfc8]">
+                {photo ? (
+                  <>
+                    <img src={photo} alt={`Shot ${i + 1}`} className="w-full h-full object-cover" />
+                    <button
+                      onClick={() => retake(i)}
+                      className="absolute top-0.5 right-0.5 w-4 h-4 bg-black/50 rounded-full text-white text-[10px] flex items-center justify-center hover:bg-black/70"
+                    >
+                      ×
+                    </button>
+                    <div className="absolute bottom-0.5 left-1">
+                      <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#8B3714" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                        <polyline points="20 6 9 17 4 12"/>
+                      </svg>
+                    </div>
+                  </>
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center">
+                    <span className="text-[10px] text-[#7a6f68]">{i + 1}</span>
+                  </div>
+                )}
+              </div>
+            )
+          })}
+          <span className="text-xs text-[#7a6f68] shrink-0 ml-1">{photos.length}/{totalShots}</span>
+        </div>
+
         {/* Bottom controls */}
-        <div className="flex items-center justify-center gap-8 pb-5 shrink-0">
+        <div className="flex items-center justify-center gap-8 py-4 md:pb-5 shrink-0">
           {allDone ? (
             <button
               onClick={onNext}
-              className="bg-[#8B3714] text-white px-8 py-3 rounded-lg font-medium hover:bg-[#732e10] transition-colors"
+              className="bg-[#8B3714] text-white px-8 py-3 rounded-lg font-medium hover:bg-[#732e10] active:bg-[#732e10] transition-colors"
             >
               Continue to Customize →
             </button>
@@ -201,7 +233,7 @@ export default function CameraStep({ format, photos, onPhotosChange, onNext, onB
               <div className="flex flex-col items-center gap-1.5">
                 <button
                   onClick={flipCamera}
-                  className="w-12 h-12 rounded-full border-2 border-[#d5cfc8] bg-white flex items-center justify-center text-[#7a6f68] hover:border-[#8B3714] hover:text-[#8B3714] transition-colors"
+                  className="w-12 h-12 rounded-full border-2 border-[#d5cfc8] bg-white flex items-center justify-center text-[#7a6f68] hover:border-[#8B3714] hover:text-[#8B3714] active:border-[#8B3714] transition-colors"
                   title="Flip camera"
                 >
                   <FlipIcon />
@@ -213,7 +245,7 @@ export default function CameraStep({ format, photos, onPhotosChange, onNext, onB
                 <button
                   onClick={shoot}
                   disabled={!ready || countdown !== null}
-                  className="w-16 h-16 rounded-full border-4 border-[#8B3714] bg-white flex items-center justify-center hover:bg-[#f5f0ea] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                  className="w-16 h-16 rounded-full border-4 border-[#8B3714] bg-white flex items-center justify-center hover:bg-[#f5f0ea] active:bg-[#f5f0ea] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                   <div className="w-9 h-9 rounded-full bg-[#8B3714]" />
                 </button>
@@ -229,8 +261,8 @@ export default function CameraStep({ format, photos, onPhotosChange, onNext, onB
         </div>
       </div>
 
-      {/* Right panel */}
-      <div className="w-52 shrink-0 border-l border-[#e5e0d8] bg-white flex flex-col">
+      {/* Right panel — tablet/desktop only */}
+      <div className="hidden md:flex w-52 shrink-0 border-l border-[#e5e0d8] bg-white flex-col">
         <div className="h-16 px-4 border-b border-[#e5e0d8] flex items-center justify-between shrink-0">
           <span className="text-xs font-semibold text-[#7a6f68] uppercase tracking-wider">Captured</span>
           <span className="text-xs font-semibold text-[#8B3714]">{photos.length} of {totalShots}</span>
@@ -252,7 +284,7 @@ export default function CameraStep({ format, photos, onPhotosChange, onNext, onB
                     </button>
                     <div className="absolute bottom-1 left-1.5">
                       <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#8B3714" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                        <polyline points="20 6 9 17 4 12" />
+                        <polyline points="20 6 9 17 4 12"/>
                       </svg>
                     </div>
                   </>

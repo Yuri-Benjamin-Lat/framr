@@ -32,7 +32,7 @@ export default function App() {
   return (
     <div className="flex h-screen overflow-hidden bg-[#f5f0ea]">
       <Sidebar step={step} />
-      <main className="flex-1 overflow-hidden">
+      <main className="flex-1 overflow-hidden pb-16 md:pb-0">
         {step === 1 && (
           <ChooseFormat format={format} onSelect={setFormat} onNext={goNext} />
         )}

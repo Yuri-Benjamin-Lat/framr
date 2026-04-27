@@ -51,8 +51,8 @@ export default function SaveShareStep({ format, photos, filter, frameColor, onRe
     } catch (_) {}
   }
 
-  const btnBase = 'flex items-center justify-center gap-2 py-3 rounded-lg font-medium transition-colors text-sm w-full'
-  const btnPrimary = `${btnBase} bg-[#8B3714] text-white hover:bg-[#732e10]`
+  const btnBase = 'flex items-center justify-center gap-2 py-3 rounded-lg font-medium transition-colors text-sm w-full active:scale-[0.98]'
+  const btnPrimary = `${btnBase} bg-[#8B3714] text-white hover:bg-[#732e10] active:bg-[#732e10]`
   const btnSecondary = `${btnBase} border border-[#e5e0d8] bg-white text-[#1a1614] hover:bg-[#f5f0ea]`
 
   const iconDown = (
@@ -73,9 +73,10 @@ export default function SaveShareStep({ format, photos, filter, frameColor, onRe
   }
 
   return (
-    <div className="flex h-full">
-      {/* Left — large preview */}
-      <div className="flex-1 flex items-center justify-center bg-[#f5f0ea] p-10 overflow-auto">
+    <div className="flex flex-col md:flex-row h-full">
+
+      {/* Preview */}
+      <div className="flex-1 flex items-center justify-center bg-[#f5f0ea] p-6 md:p-10 overflow-auto min-h-[38vh] md:min-h-0">
         {outputUrl && (
           <img
             src={outputUrl}
@@ -85,17 +86,19 @@ export default function SaveShareStep({ format, photos, filter, frameColor, onRe
         )}
       </div>
 
-      {/* Right — actions panel */}
-      <div className="w-80 shrink-0 border-l border-[#e5e0d8] bg-white flex flex-col">
-        <div className="h-16 px-6 border-b border-[#e5e0d8] flex items-center shrink-0">
+      {/* Actions panel */}
+      <div className="md:w-80 shrink-0 border-t md:border-t-0 md:border-l border-[#e5e0d8] bg-white flex flex-col overflow-y-auto">
+
+        {/* Header — desktop only */}
+        <div className="hidden md:flex h-16 px-6 border-b border-[#e5e0d8] items-center shrink-0">
           <div>
-            <h2 className="font-semibold text-[#1a1614] leading-none">Save & Share</h2>
+            <h2 className="font-semibold text-[#1a1614] leading-none">Save &amp; Share</h2>
             <p className="text-xs text-[#7a6f68] mt-0.5">Download or print</p>
           </div>
         </div>
 
-        <div className="flex-1 overflow-y-auto p-6 flex flex-col gap-6">
-          {/* Status */}
+        <div className="p-5 md:p-6 flex flex-col gap-5 md:gap-6">
+          {/* Status card */}
           <div className="flex items-center gap-3 p-4 bg-[#f5f0ea] rounded-xl">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8B3714" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <polyline points="20 6 9 17 4 12"/>
@@ -135,15 +138,16 @@ export default function SaveShareStep({ format, photos, filter, frameColor, onRe
               Share
             </button>
           </div>
-        </div>
 
-        <div className="p-6 border-t border-[#e5e0d8] flex flex-col gap-1 shrink-0">
-          <button onClick={onBack} className="text-sm text-[#7a6f68] hover:text-[#1a1614] transition-colors text-left py-1">
-            ← Back to customize
-          </button>
-          <button onClick={onRestart} className="text-sm text-[#7a6f68] hover:text-[#1a1614] transition-colors text-left py-1">
-            ← Start a new strip
-          </button>
+          {/* Nav links */}
+          <div className="flex flex-col gap-1 pt-1 border-t border-[#e5e0d8]">
+            <button onClick={onBack} className="text-sm text-[#7a6f68] hover:text-[#1a1614] transition-colors text-left py-1.5">
+              ← Back to customize
+            </button>
+            <button onClick={onRestart} className="text-sm text-[#7a6f68] hover:text-[#1a1614] transition-colors text-left py-1.5">
+              ← Start a new strip
+            </button>
+          </div>
         </div>
       </div>
     </div>
