@@ -52,8 +52,8 @@ export default function ChooseFormat({ format, onSelect, onNext }) {
   return (
     <div className="flex flex-col h-full p-5 md:p-10 overflow-y-auto">
       <div className="mb-6 md:mb-8">
-        <h1 className="text-2xl md:text-3xl font-semibold text-[#1a1614] mb-1">Choose a format</h1>
-        <p className="text-sm md:text-base text-[#7a6f68]">Select the layout for your photo strip</p>
+        <h1 className="text-2xl md:text-3xl font-semibold text-[#1a1614] dark:text-[#ede8e0] mb-1">Choose a format</h1>
+        <p className="text-sm md:text-base text-[#7a6f68] dark:text-[#8c7e78]">Select the layout for your photo strip</p>
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4 flex-1 content-start">
@@ -61,18 +61,18 @@ export default function ChooseFormat({ format, onSelect, onNext }) {
           <button
             key={f.id}
             onClick={() => onSelect(f)}
-            className={`h-36 md:h-52 flex flex-col items-center justify-center gap-3 md:gap-4 p-4 md:p-6 rounded-xl border-2 bg-white transition-all active:scale-[0.98] ${
+            className={`h-36 md:h-52 flex flex-col items-center justify-center gap-3 md:gap-4 p-4 md:p-6 rounded-xl border-2 bg-white dark:bg-[#221a18] transition-all active:scale-[0.98] ${
               format.id === f.id
                 ? 'border-[#8B3714] shadow-sm'
-                : 'border-[#e5e0d8] hover:border-[#c5bfb8]'
+                : 'border-[#e5e0d8] dark:border-[#3d2f2b] hover:border-[#c5bfb8] dark:hover:border-[#5a4a46]'
             }`}
           >
             <div className="h-10 md:h-16 flex items-center justify-center scale-75 md:scale-100 origin-center">
               <FormatIcon layout={f.layout} />
             </div>
             <div className="text-center">
-              <p className="font-medium text-[#1a1614] text-xs md:text-sm">{f.name}</p>
-              <p className="text-xs text-[#7a6f68] mt-0.5 hidden sm:block">{f.description}</p>
+              <p className="font-medium text-[#1a1614] dark:text-[#ede8e0] text-xs md:text-sm">{f.name}</p>
+              <p className="text-xs text-[#7a6f68] dark:text-[#8c7e78] mt-0.5 hidden sm:block">{f.description}</p>
             </div>
           </button>
         ))}

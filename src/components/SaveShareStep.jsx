@@ -52,8 +52,8 @@ export default function SaveShareStep({ format, photos, filter, frameColor, onRe
   }
 
   const btnBase = 'flex items-center justify-center gap-2 py-3 rounded-lg font-medium transition-colors text-sm w-full active:scale-[0.98]'
-  const btnPrimary = `${btnBase} bg-[#8B3714] text-white hover:bg-[#732e10] active:bg-[#732e10]`
-  const btnSecondary = `${btnBase} border border-[#e5e0d8] bg-white text-[#1a1614] hover:bg-[#f5f0ea]`
+  const btnPrimary = `${btnBase} bg-[#8B3714] text-white hover:bg-[#732e10]`
+  const btnSecondary = `${btnBase} border border-[#e5e0d8] dark:border-[#3d2f2b] bg-white dark:bg-[#2c2220] text-[#1a1614] dark:text-[#ede8e0] hover:bg-[#f5f0ea] dark:hover:bg-[#352825]`
 
   const iconDown = (
     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -65,9 +65,9 @@ export default function SaveShareStep({ format, photos, filter, frameColor, onRe
 
   if (generating) {
     return (
-      <div className="flex flex-col items-center justify-center h-full gap-3">
+      <div className="flex flex-col items-center justify-center h-full gap-3 bg-[#f5f0ea] dark:bg-[#191210]">
         <div className="w-8 h-8 border-2 border-[#8B3714] border-t-transparent rounded-full animate-spin" />
-        <p className="text-sm text-[#7a6f68]">Compositing your print…</p>
+        <p className="text-sm text-[#7a6f68] dark:text-[#8c7e78]">Compositing your print…</p>
       </div>
     )
   }
@@ -76,36 +76,31 @@ export default function SaveShareStep({ format, photos, filter, frameColor, onRe
     <div className="flex flex-col md:flex-row h-full">
 
       {/* Preview */}
-      <div className="flex-1 flex items-center justify-center bg-[#f5f0ea] p-6 md:p-10 overflow-auto min-h-[38vh] md:min-h-0">
+      <div className="flex-1 flex items-center justify-center bg-[#f5f0ea] dark:bg-[#191210] p-6 md:p-10 overflow-auto min-h-[38vh] md:min-h-0">
         {outputUrl && (
-          <img
-            src={outputUrl}
-            alt="Your print"
-            className="max-w-full max-h-full object-contain rounded-lg shadow-2xl"
-          />
+          <img src={outputUrl} alt="Your print" className="max-w-full max-h-full object-contain rounded-lg shadow-2xl" />
         )}
       </div>
 
       {/* Actions panel */}
-      <div className="md:w-80 shrink-0 border-t md:border-t-0 md:border-l border-[#e5e0d8] bg-white flex flex-col overflow-y-auto">
+      <div className="md:w-80 shrink-0 border-t md:border-t-0 md:border-l border-[#e5e0d8] dark:border-[#3d2f2b] bg-white dark:bg-[#221a18] flex flex-col overflow-y-auto">
 
-        {/* Header — desktop only */}
-        <div className="hidden md:flex h-16 px-6 border-b border-[#e5e0d8] items-center shrink-0">
+        <div className="hidden md:flex h-16 px-6 border-b border-[#e5e0d8] dark:border-[#3d2f2b] items-center shrink-0">
           <div>
-            <h2 className="font-semibold text-[#1a1614] leading-none">Save &amp; Share</h2>
-            <p className="text-xs text-[#7a6f68] mt-0.5">Download or print</p>
+            <h2 className="font-semibold text-[#1a1614] dark:text-[#ede8e0] leading-none">Save &amp; Share</h2>
+            <p className="text-xs text-[#7a6f68] dark:text-[#8c7e78] mt-0.5">Download or print</p>
           </div>
         </div>
 
         <div className="p-5 md:p-6 flex flex-col gap-5 md:gap-6">
-          {/* Status card */}
-          <div className="flex items-center gap-3 p-4 bg-[#f5f0ea] rounded-xl">
+          {/* Status */}
+          <div className="flex items-center gap-3 p-4 bg-[#f5f0ea] dark:bg-[#2c2220] rounded-xl">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8B3714" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <polyline points="20 6 9 17 4 12"/>
             </svg>
             <div>
-              <p className="font-semibold text-[#1a1614] text-sm leading-none mb-0.5">Your strip is ready</p>
-              <p className="text-xs text-[#7a6f68]">
+              <p className="font-semibold text-[#1a1614] dark:text-[#ede8e0] text-sm leading-none mb-0.5">Your strip is ready</p>
+              <p className="text-xs text-[#7a6f68] dark:text-[#8c7e78]">
                 {format.name} · {format.photoCount} {format.photoCount === 1 ? 'photo' : 'photos'}
               </p>
             </div>
@@ -113,14 +108,14 @@ export default function SaveShareStep({ format, photos, filter, frameColor, onRe
 
           {/* Download */}
           <div className="flex flex-col gap-2">
-            <p className="text-xs font-semibold text-[#7a6f68] uppercase tracking-wider">Download</p>
+            <p className="text-xs font-semibold text-[#7a6f68] dark:text-[#8c7e78] uppercase tracking-wider">Download</p>
             <button onClick={downloadPng} className={btnPrimary}>{iconDown} Download PNG</button>
             <button onClick={downloadJpeg} className={btnSecondary}>{iconDown} Download JPEG</button>
           </div>
 
           {/* Other */}
           <div className="flex flex-col gap-2">
-            <p className="text-xs font-semibold text-[#7a6f68] uppercase tracking-wider">Other</p>
+            <p className="text-xs font-semibold text-[#7a6f68] dark:text-[#8c7e78] uppercase tracking-wider">Other</p>
             <button onClick={print} className={btnSecondary}>
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <polyline points="6 9 6 2 18 2 18 9"/>
@@ -140,11 +135,11 @@ export default function SaveShareStep({ format, photos, filter, frameColor, onRe
           </div>
 
           {/* Nav links */}
-          <div className="flex flex-col gap-1 pt-1 border-t border-[#e5e0d8]">
-            <button onClick={onBack} className="text-sm text-[#7a6f68] hover:text-[#1a1614] transition-colors text-left py-1.5">
+          <div className="flex flex-col gap-1 pt-1 border-t border-[#e5e0d8] dark:border-[#3d2f2b]">
+            <button onClick={onBack} className="text-sm text-[#7a6f68] dark:text-[#8c7e78] hover:text-[#1a1614] dark:hover:text-[#ede8e0] transition-colors text-left py-1.5">
               ← Back to customize
             </button>
-            <button onClick={onRestart} className="text-sm text-[#7a6f68] hover:text-[#1a1614] transition-colors text-left py-1.5">
+            <button onClick={onRestart} className="text-sm text-[#7a6f68] dark:text-[#8c7e78] hover:text-[#1a1614] dark:hover:text-[#ede8e0] transition-colors text-left py-1.5">
               ← Start a new strip
             </button>
           </div>

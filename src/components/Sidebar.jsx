@@ -1,8 +1,8 @@
 const STEPS = [
-  { num: 1, label: 'Choose Format', sub: 'Pick a layout',       short: 'Format'   },
-  { num: 2, label: 'Camera',        sub: 'Take your shots',     short: 'Camera'   },
-  { num: 3, label: 'Customize',     sub: 'Filter & frame',      short: 'Edit'     },
-  { num: 4, label: 'Save & Share',  sub: 'Download or print',   short: 'Save'     },
+  { num: 1, label: 'Choose Format', sub: 'Pick a layout',     short: 'Format' },
+  { num: 2, label: 'Camera',        sub: 'Take your shots',   short: 'Camera' },
+  { num: 3, label: 'Customize',     sub: 'Filter & frame',    short: 'Edit'   },
+  { num: 4, label: 'Save & Share',  sub: 'Download or print', short: 'Save'   },
 ]
 
 function CheckIcon() {
@@ -22,14 +22,51 @@ function Logo() {
   )
 }
 
-export default function Sidebar({ step }) {
+function MoonIcon() {
+  return (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+    </svg>
+  )
+}
+
+function SunIcon() {
+  return (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="5"/>
+      <line x1="12" y1="1"  x2="12" y2="3"/>
+      <line x1="12" y1="21" x2="12" y2="23"/>
+      <line x1="4.22"  y1="4.22"  x2="5.64"  y2="5.64"/>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+      <line x1="1"  y1="12" x2="3"  y2="12"/>
+      <line x1="21" y1="12" x2="23" y2="12"/>
+      <line x1="4.22"  y1="19.78" x2="5.64"  y2="18.36"/>
+      <line x1="18.36" y1="5.64"  x2="19.78" y2="4.22"/>
+    </svg>
+  )
+}
+
+export default function Sidebar({ step, isDark, toggleDark }) {
+  function ThemeBtn({ extraClass = '' }) {
+    return (
+      <button
+        onClick={toggleDark}
+        title={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
+        className={`w-8 h-8 rounded-full flex items-center justify-center text-[#7a6f68] dark:text-[#8c7e78] hover:bg-[#f0ece6] dark:hover:bg-[#2c2220] transition-colors ${extraClass}`}
+      >
+        {isDark ? <SunIcon /> : <MoonIcon />}
+      </button>
+    )
+  }
+
   return (
     <>
-      {/* ── Desktop: full sidebar (lg+) ── */}
-      <aside className="hidden lg:flex w-64 shrink-0 bg-white border-r border-[#e5e0d8] flex-col">
-        <div className="h-16 px-6 border-b border-[#e5e0d8] flex items-center gap-2 shrink-0">
+      {/* ── Desktop sidebar (lg+) ── */}
+      <aside className="hidden lg:flex w-64 shrink-0 bg-white dark:bg-[#221a18] border-r border-[#e5e0d8] dark:border-[#3d2f2b] flex-col">
+        <div className="h-16 px-6 border-b border-[#e5e0d8] dark:border-[#3d2f2b] flex items-center gap-2 shrink-0">
           <Logo />
-          <span className="font-semibold text-[#1a1614] text-lg tracking-tight">Framr</span>
+          <span className="font-semibold text-[#1a1614] dark:text-[#ede8e0] text-lg tracking-tight">Framr</span>
+          <ThemeBtn extraClass="ml-auto" />
         </div>
         <nav className="p-6 flex flex-col">
           {STEPS.map((s, i) => {
@@ -39,20 +76,22 @@ export default function Sidebar({ step }) {
               <div key={s.num} className="flex gap-3 items-start">
                 <div className="flex flex-col items-center">
                   <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium shrink-0 transition-colors ${
-                    done || active ? 'bg-[#8B3714] text-white' : 'border-2 border-[#d5cfc8] text-[#7a6f68]'
+                    done || active
+                      ? 'bg-[#8B3714] text-white'
+                      : 'border-2 border-[#d5cfc8] dark:border-[#4a3a36] text-[#7a6f68] dark:text-[#8c7e78]'
                   }`}>
                     {done ? <CheckIcon /> : s.num}
                   </div>
                   {i < STEPS.length - 1 && (
-                    <div className={`w-px min-h-[28px] flex-1 mt-1 mb-1 ${done ? 'bg-[#8B3714]' : 'bg-[#e5e0d8]'}`} />
+                    <div className={`w-px min-h-[28px] flex-1 mt-1 mb-1 ${done ? 'bg-[#8B3714]' : 'bg-[#e5e0d8] dark:bg-[#3d2f2b]'}`} />
                   )}
                 </div>
                 <div className={`pt-1 ${i < STEPS.length - 1 ? 'pb-7' : ''}`}>
-                  <p className={`text-sm font-medium leading-none ${active ? 'text-[#1a1614]' : 'text-[#7a6f68]'}`}>
+                  <p className={`text-sm font-medium leading-none ${active ? 'text-[#1a1614] dark:text-[#ede8e0]' : 'text-[#7a6f68] dark:text-[#8c7e78]'}`}>
                     {s.label}
                   </p>
                   {active && (
-                    <p className="text-xs text-[#8B3714] mt-1.5">{s.sub}</p>
+                    <p className="text-xs text-[#8B3714] dark:text-[#c4643a] mt-1.5">{s.sub}</p>
                   )}
                 </div>
               </div>
@@ -61,9 +100,9 @@ export default function Sidebar({ step }) {
         </nav>
       </aside>
 
-      {/* ── Tablet: icon rail (md–lg) ── */}
-      <aside className="hidden md:flex lg:hidden w-16 shrink-0 bg-white border-r border-[#e5e0d8] flex-col">
-        <div className="h-16 border-b border-[#e5e0d8] flex items-center justify-center shrink-0">
+      {/* ── Tablet icon rail (md–lg) ── */}
+      <aside className="hidden md:flex lg:hidden w-16 shrink-0 bg-white dark:bg-[#221a18] border-r border-[#e5e0d8] dark:border-[#3d2f2b] flex-col">
+        <div className="h-16 border-b border-[#e5e0d8] dark:border-[#3d2f2b] flex items-center justify-center shrink-0">
           <Logo />
         </div>
         <nav className="flex flex-col items-center py-6 gap-4">
@@ -75,39 +114,55 @@ export default function Sidebar({ step }) {
                 <div
                   title={s.label}
                   className={`w-9 h-9 rounded-full flex items-center justify-center text-sm font-medium transition-colors ${
-                    done || active ? 'bg-[#8B3714] text-white' : 'border-2 border-[#d5cfc8] text-[#7a6f68]'
+                    done || active
+                      ? 'bg-[#8B3714] text-white'
+                      : 'border-2 border-[#d5cfc8] dark:border-[#4a3a36] text-[#7a6f68] dark:text-[#8c7e78]'
                   }`}
                 >
                   {done ? <CheckIcon /> : s.num}
                 </div>
-                <span className={`text-[9px] leading-none text-center ${active ? 'text-[#8B3714] font-semibold' : 'text-[#b0a898]'}`}>
+                <span className={`text-[9px] leading-none text-center ${active ? 'text-[#8B3714] dark:text-[#c4643a] font-semibold' : 'text-[#b0a898] dark:text-[#5a4e48]'}`}>
                   {s.short}
                 </span>
               </div>
             )
           })}
         </nav>
+        <div className="mt-auto pb-5 flex justify-center">
+          <ThemeBtn />
+        </div>
       </aside>
 
-      {/* ── Mobile: bottom tab bar (< md) ── */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-[#e5e0d8] flex safe-bottom">
+      {/* ── Mobile bottom tab bar ── */}
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white dark:bg-[#221a18] border-t border-[#e5e0d8] dark:border-[#3d2f2b] flex">
         {STEPS.map((s) => {
           const done = step > s.num
           const active = step === s.num
           return (
             <div key={s.num} className="flex-1 flex flex-col items-center justify-center py-2 gap-1">
               <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-semibold transition-colors ${
-                done || active ? 'bg-[#8B3714] text-white' : 'border border-[#d5cfc8] text-[#b0a898]'
+                done || active
+                  ? 'bg-[#8B3714] text-white'
+                  : 'border border-[#d5cfc8] dark:border-[#4a3a36] text-[#b0a898] dark:text-[#5a4e48]'
               }`}>
                 {done ? <CheckIcon /> : s.num}
               </div>
-              <span className={`text-[10px] leading-none ${active ? 'text-[#8B3714] font-semibold' : 'text-[#b0a898]'}`}>
+              <span className={`text-[10px] leading-none ${active ? 'text-[#8B3714] dark:text-[#c4643a] font-semibold' : 'text-[#b0a898] dark:text-[#5a4e48]'}`}>
                 {s.short}
               </span>
             </div>
           )
         })}
       </nav>
+
+      {/* Mobile: floating theme toggle top-right */}
+      <button
+        onClick={toggleDark}
+        title={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
+        className="md:hidden fixed top-3 right-3 z-40 w-9 h-9 rounded-full bg-white dark:bg-[#221a18] border border-[#e5e0d8] dark:border-[#3d2f2b] flex items-center justify-center text-[#7a6f68] dark:text-[#8c7e78] shadow-sm transition-colors"
+      >
+        {isDark ? <SunIcon /> : <MoonIcon />}
+      </button>
     </>
   )
 }

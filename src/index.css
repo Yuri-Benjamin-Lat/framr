@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
 
 body {
   margin: 0;
@@ -8,6 +9,38 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+.dark body {
+  background-color: #191210;
+  color: #ede8e0;
+}
+
 * {
   box-sizing: border-box;
 }
+
+@keyframes splash-logo-in {
+  0%   { opacity: 0; transform: scale(0.85); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+@keyframes lens-fill-flash {
+  0%   { fill: white; }
+  35%  { fill: white; }
+  100% { fill: rgba(255,255,255,0); }
+}
+
+@keyframes lens-glow-ring {
+  0%   { transform: scale(1);   opacity: 0.85; }
+  100% { transform: scale(2.4); opacity: 0; }
+}
+
+@keyframes lens-sparkle {
+  0%   { transform: scale(1);   opacity: 1; }
+  25%  {                         opacity: 1; }
+  100% { transform: scale(2.8); opacity: 0; }
+}
+
+.splash-logo      { animation: splash-logo-in 0.6s cubic-bezier(0.2,0,0.3,1) both; }
+.lens-flash-fill  { animation: lens-fill-flash 0.5s ease-out forwards; }
+.lens-glow-ring   { transform-origin: 12px 13px; animation: lens-glow-ring 0.6s ease-out forwards; }
+.lens-sparkle     { transform-origin: 12px 13px; animation: lens-sparkle 0.55s cubic-bezier(0.2,0,0.5,1) forwards; }
