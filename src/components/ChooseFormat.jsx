@@ -60,6 +60,7 @@ export default function ChooseFormat({ format, onSelect, onNext }) {
           <button
             key={f.id}
             onClick={() => onSelect(f)}
+            onDoubleClick={() => { onSelect(f); onNext() }}
             className={`h-36 md:h-52 flex flex-col items-center justify-center gap-3 md:gap-4 p-4 md:p-6 rounded-xl border-2 bg-white dark:bg-[#221a18] transition-all active:scale-[0.98] ${
               format.id === f.id
                 ? 'border-[#8B3714] shadow-sm'

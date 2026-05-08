@@ -11,6 +11,7 @@ export default function CameraStep({ format, photos, onPhotosChange, onNext, onB
 
   const totalShots = format.photoCount
   const allDone = photos.length >= totalShots
+  const isSquare = format.layout === 'polaroid' || format.layout === 'modern-grid'
 
   useEffect(() => {
     start('user')
@@ -149,12 +150,24 @@ export default function CameraStep({ format, photos, onPhotosChange, onNext, onB
                 }}
               />
             )}
-            {!flashing && (
+            {!flashing && !isSquare && (
               <>
                 <div className="absolute top-3 left-3 w-5 h-5 border-t-2 border-l-2 border-[#8B3714] pointer-events-none" />
                 <div className="absolute top-3 right-3 w-5 h-5 border-t-2 border-r-2 border-[#8B3714] pointer-events-none" />
                 <div className="absolute bottom-3 left-3 w-5 h-5 border-b-2 border-l-2 border-[#8B3714] pointer-events-none" />
                 <div className="absolute bottom-3 right-3 w-5 h-5 border-b-2 border-r-2 border-[#8B3714] pointer-events-none" />
+              </>
+            )}
+            {!flashing && isSquare && (
+              <>
+                <div className="absolute left-0 top-0 bottom-0 w-[21.875%] bg-black/50 pointer-events-none" />
+                <div className="absolute right-0 top-0 bottom-0 w-[21.875%] bg-black/50 pointer-events-none" />
+                <div className="absolute inset-y-3 left-[21.875%] right-[21.875%] pointer-events-none">
+                  <div className="absolute top-0 left-0 w-5 h-5 border-t-2 border-l-2 border-[#8B3714]" />
+                  <div className="absolute top-0 right-0 w-5 h-5 border-t-2 border-r-2 border-[#8B3714]" />
+                  <div className="absolute bottom-0 left-0 w-5 h-5 border-b-2 border-l-2 border-[#8B3714]" />
+                  <div className="absolute bottom-0 right-0 w-5 h-5 border-b-2 border-r-2 border-[#8B3714]" />
+                </div>
               </>
             )}
             {flashing && <div className="absolute inset-0 bg-white" />}

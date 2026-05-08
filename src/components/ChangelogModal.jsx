@@ -19,10 +19,10 @@ const V1_RELEASES = [
   {
     version: 'V1.0.1',
     date: 'May 2025',
-    description: 'A focused polish update improving the experience on smaller screens and adding visibility into how framr evolves over time.',
     features: [
-      'Refined layouts and spacing across mobile and tablet breakpoints for a cleaner, more comfortable experience on smaller screens',
-      'Introduced this changelog — a version history log accessible right from the footer, so you can always see what\'s new',
+      'Improved layouts and spacing on mobile and tablet screens',
+      'Introduced this changelog, accessible from the footer',
+      'Square crop guide overlay on the camera for Polaroid Snap and Modern Grid — sides dim so you know exactly where to frame',
     ],
   },
 ]
@@ -89,7 +89,7 @@ export default function ChangelogModal({ onClose }) {
                     </div>
                   </div>
 
-                  <p className="text-xs text-[#4a3f3a] dark:text-[#c8bdb8] leading-relaxed mb-4">{release.description}</p>
+                  {release.description && <p className="text-xs text-[#4a3f3a] dark:text-[#c8bdb8] leading-relaxed mb-4">{release.description}</p>}
 
                   <div className="space-y-1.5">
                     <span className="inline-block text-[9px] font-bold uppercase tracking-wide px-1.5 py-0.5 rounded bg-[#8B3714]/10 text-[#8B3714] dark:bg-[#8B3714]/20 dark:text-[#c4714a] mb-1">
