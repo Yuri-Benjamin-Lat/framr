@@ -63,6 +63,7 @@ The project uses `.jsx` files without TypeScript compilation. `@types` packages 
 
 - Never run git commit or git push — the user handles all git operations
 - After every change, suggest a commit message covering everything that was modified
+- Always, for all yet to be commited changes, combine all the messages into a new commit message
 - Never rewrite an entire file unless absolutely necessary — only edit the specific lines that changed
 - Always state which file and line(s) you are editing before making the edit
 - User is on Windows (PowerShell terminal)

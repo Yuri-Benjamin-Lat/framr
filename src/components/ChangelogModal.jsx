@@ -2,6 +2,15 @@ import { useState } from 'react'
 
 const V1_RELEASES = [
   {
+    version: 'V1.0.1',
+    date: 'May 2025',
+    features: [
+      'Improved layouts and spacing on mobile and tablet screens',
+      'Introduced this changelog, accessible from the footer',
+      'Square crop guide overlay on the camera for Polaroid Snap and Modern Grid — sides dim so you know exactly where to frame',
+    ],
+  },
+  {
     version: 'V1.0.0',
     date: 'May 2025',
     description: 'framr is a browser-based instant photo booth — no app to download, no account needed, and nothing ever leaves your device. Open it, pick a layout, and start shooting.',
@@ -14,15 +23,6 @@ const V1_RELEASES = [
       'Fully responsive — works on mobile, tablet, and desktop',
       'Dark mode with a warm darkroom palette, remembered across sessions',
       'Privacy-first: everything runs in your browser, nothing is uploaded',
-    ],
-  },
-  {
-    version: 'V1.0.1',
-    date: 'May 2025',
-    features: [
-      'Improved layouts and spacing on mobile and tablet screens',
-      'Introduced this changelog, accessible from the footer',
-      'Square crop guide overlay on the camera for Polaroid Snap and Modern Grid — sides dim so you know exactly where to frame',
     ],
   },
 ]
@@ -79,12 +79,9 @@ export default function ChangelogModal({ onClose }) {
                     </div>
                     <div className="flex justify-end">
                       {idx === 0 && (
-                        <button
-                          onClick={() => setMajor('v2')}
-                          className="flex items-center gap-1 text-[10px] text-[#b0a898] dark:text-[#5c4f4a] hover:text-[#8B3714] dark:hover:text-[#c4714a] transition-colors"
-                        >
+                        <span className="flex items-center gap-1 text-[10px] text-[#d5cfc8] dark:text-[#3d2f2b] cursor-not-allowed select-none">
                           V2.0.0 <ArrowIcon direction="right" />
-                        </button>
+                        </span>
                       )}
                     </div>
                   </div>
