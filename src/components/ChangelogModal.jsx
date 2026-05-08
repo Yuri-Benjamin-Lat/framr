@@ -8,6 +8,7 @@ const V1_RELEASES = [
       'Improved layouts and spacing on mobile and tablet screens',
       'Introduced this changelog, accessible from the footer',
       'Square crop guide overlay on the camera for Polaroid Snap and Modern Grid — sides dim so you know exactly where to frame',
+      'Zoom into the preview with scroll or pinch, then freely drag it around',
     ],
   },
   {
