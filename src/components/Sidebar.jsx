@@ -1,3 +1,6 @@
+import { useState } from 'react'
+import ChangelogModal from './ChangelogModal'
+
 const STEPS = [
   { num: 1, label: 'Choose Format', sub: 'Pick a layout', short: 'Format' },
   { num: 2, label: 'Camera', sub: 'Take your shots', short: 'Camera' },
@@ -49,6 +52,7 @@ function SunIcon() {
 const PRIVACY_NOTE = "framr doesn't store, upload, or see your photos. All processing happens directly in your browser — nothing is sent to any server."
 
 export default function Sidebar({ step, isDark, toggleDark }) {
+  const [showChangelog, setShowChangelog] = useState(false)
   function ThemeBtn({ extraClass = '' }) {
     return (
       <button
@@ -99,9 +103,10 @@ export default function Sidebar({ step, isDark, toggleDark }) {
         <div className="mt-auto p-5 border-t border-[#e5e0d8] dark:border-[#3d2f2b]">
           <p className="text-[10px] text-[#b0a898] dark:text-[#5c4f4a] leading-relaxed">{PRIVACY_NOTE}</p>
           <div className="flex justify-between text-[10px] text-[#b0a898] dark:text-[#5c4f4a] mt-2">
-            <span>framr v1.0</span>
+            <button onClick={() => setShowChangelog(true)} className="underline decoration-dotted underline-offset-2 hover:text-[#8B3714] dark:hover:text-[#c4714a] transition-colors">framr v1.0</button>
             <span>Created by Yuri L.</span>
           </div>
+          {showChangelog && <ChangelogModal onClose={() => setShowChangelog(false)} />}
         </div>
       </aside>
 

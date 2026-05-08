@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react'
 import { compositePhoto } from '../utils/canvas'
+import ChangelogModal from './ChangelogModal'
 
 const PRIVACY_NOTE = "framr doesn't store, upload, or see your photos. All processing happens directly in your browser — nothing is sent to any server."
 
 export default function SaveShareStep({ format, photos, filter, frameColor, onRestart, onBack }) {
   const [outputUrl, setOutputUrl] = useState(null)
   const [generating, setGenerating] = useState(true)
+  const [showChangelog, setShowChangelog] = useState(false)
 
   useEffect(() => {
     compositePhoto({ photos, format, filter, frameColor }).then(url => {
@@ -150,9 +152,10 @@ export default function SaveShareStep({ format, photos, filter, frameColor, onRe
           <div className="pt-1 border-t border-[#e5e0d8] dark:border-[#3d2f2b] flex flex-col gap-1">
             <p className="text-[10px] text-[#b0a898] dark:text-[#5c4f4a] leading-relaxed">{PRIVACY_NOTE}</p>
             <div className="flex justify-between text-[10px] text-[#b0a898] dark:text-[#5c4f4a]">
-              <span>framr v1.0</span>
+              <button onClick={() => setShowChangelog(true)} className="underline decoration-dotted underline-offset-2 hover:text-[#8B3714] dark:hover:text-[#c4714a] transition-colors">framr v1.0</button>
               <span>Created by Yuri L.</span>
             </div>
+            {showChangelog && <ChangelogModal onClose={() => setShowChangelog(false)} />}
           </div>
         </div>
       </div>
