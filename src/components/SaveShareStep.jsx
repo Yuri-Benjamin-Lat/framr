@@ -149,7 +149,10 @@ export default function SaveShareStep({ format, photos, filter, frameColor, onRe
           {/* Privacy note */}
           <div className="pt-1 border-t border-[#e5e0d8] dark:border-[#3d2f2b] flex flex-col gap-1">
             <p className="text-[10px] text-[#b0a898] dark:text-[#5c4f4a] leading-relaxed">{PRIVACY_NOTE}</p>
-            <p className="text-[10px] text-[#b0a898] dark:text-[#5c4f4a]">framr v1.0 · Created by Yuri L.</p>
+            <div className="flex justify-between text-[10px] text-[#b0a898] dark:text-[#5c4f4a]">
+              <span>framr v1.0</span>
+              <span>Created by Yuri L.</span>
+            </div>
           </div>
         </div>
       </div>

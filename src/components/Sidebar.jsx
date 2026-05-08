@@ -98,7 +98,10 @@ export default function Sidebar({ step, isDark, toggleDark }) {
         </nav>
         <div className="mt-auto p-5 border-t border-[#e5e0d8] dark:border-[#3d2f2b]">
           <p className="text-[10px] text-[#b0a898] dark:text-[#5c4f4a] leading-relaxed">{PRIVACY_NOTE}</p>
-          <p className="text-[10px] text-[#b0a898] dark:text-[#5c4f4a] mt-2">framr v1.0 · Created by Yuri L.</p>
+          <div className="flex justify-between text-[10px] text-[#b0a898] dark:text-[#5c4f4a] mt-2">
+            <span>framr v1.0</span>
+            <span>Created by Yuri L.</span>
+          </div>
         </div>
       </aside>
 
