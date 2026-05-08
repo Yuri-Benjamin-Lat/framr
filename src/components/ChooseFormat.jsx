@@ -4,9 +4,8 @@ function FormatIcon({ layout }) {
   switch (layout) {
     case 'polaroid':
       return (
-        <svg width="48" height="58" viewBox="0 0 48 58" fill="none">
-          <rect x="4" y="4" width="40" height="36" fill="#d5cfc8" rx="2"/>
-          <rect x="4" y="44" width="40" height="10" fill="#e8e3dc" rx="1"/>
+        <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+          <rect x="4" y="4" width="40" height="40" fill="#d5cfc8" rx="2"/>
         </svg>
       )
     case 'vertical-strip':
