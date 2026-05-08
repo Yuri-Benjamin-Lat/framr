@@ -50,7 +50,7 @@ export default function SaveShareStep({ format, photos, filter, frameColor, onRe
       const blob = await (await fetch(outputUrl)).blob()
       const file = new File([blob], `framr-${format.id}.png`, { type: 'image/png' })
       await navigator.share({ files: [file], title: 'framr', text: `My ${format.name}` })
-    } catch (_) { }
+    } catch (_) {}
   }
 
   const btnBase = 'flex items-center justify-center gap-2 py-3 rounded-lg font-medium transition-colors text-sm w-full active:scale-[0.98]'
@@ -59,9 +59,9 @@ export default function SaveShareStep({ format, photos, filter, frameColor, onRe
 
   const iconDown = (
     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-      <polyline points="7 10 12 15 17 10" />
-      <line x1="12" y1="15" x2="12" y2="3" />
+      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+      <polyline points="7 10 12 15 17 10"/>
+      <line x1="12" y1="15" x2="12" y2="3"/>
     </svg>
   )
 
@@ -75,17 +75,17 @@ export default function SaveShareStep({ format, photos, filter, frameColor, onRe
   }
 
   return (
-    <div className="flex flex-col md:flex-row h-full">
+    <div className="flex flex-col md:flex-row md:h-full">
 
       {/* Preview */}
-      <div className="flex-1 flex items-center justify-center bg-[#f5f0ea] dark:bg-[#191210] p-6 md:p-10 overflow-auto min-h-[38vh] md:min-h-0">
+      <div className="flex-1 flex items-center justify-center bg-[#f5f0ea] dark:bg-[#191210] p-6 md:p-10 min-h-[40vh] md:min-h-0 md:overflow-auto">
         {outputUrl && (
           <img src={outputUrl} alt="Your print" className="max-w-full max-h-full object-contain rounded-lg shadow-2xl" />
         )}
       </div>
 
       {/* Actions panel */}
-      <div className="md:w-80 shrink-0 border-t md:border-t-0 md:border-l border-[#e5e0d8] dark:border-[#3d2f2b] bg-white dark:bg-[#221a18] flex flex-col overflow-y-auto">
+      <div className="md:w-80 shrink-0 border-t md:border-t-0 md:border-l border-[#e5e0d8] dark:border-[#3d2f2b] bg-white dark:bg-[#221a18] flex flex-col md:overflow-y-auto">
 
         <div className="hidden md:flex h-16 px-6 border-b border-[#e5e0d8] dark:border-[#3d2f2b] items-center shrink-0">
           <div>
@@ -98,7 +98,7 @@ export default function SaveShareStep({ format, photos, filter, frameColor, onRe
           {/* Status */}
           <div className="flex items-center gap-3 p-4 bg-[#f5f0ea] dark:bg-[#2c2220] rounded-xl">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8B3714" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <polyline points="20 6 9 17 4 12" />
+              <polyline points="20 6 9 17 4 12"/>
             </svg>
             <div>
               <p className="font-semibold text-[#1a1614] dark:text-[#ede8e0] text-sm leading-none mb-0.5">Your strip is ready</p>
@@ -120,17 +120,17 @@ export default function SaveShareStep({ format, photos, filter, frameColor, onRe
             <p className="text-xs font-semibold text-[#7a6f68] dark:text-[#8c7e78] uppercase tracking-wider">Other</p>
             <button onClick={print} className={btnSecondary}>
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <polyline points="6 9 6 2 18 2 18 9" />
-                <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" />
-                <rect x="6" y="14" width="12" height="8" />
+                <polyline points="6 9 6 2 18 2 18 9"/>
+                <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/>
+                <rect x="6" y="14" width="12" height="8"/>
               </svg>
               Print
             </button>
             <button onClick={share} className={btnSecondary}>
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="18" cy="5" r="3" /><circle cx="6" cy="12" r="3" /><circle cx="18" cy="19" r="3" />
-                <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" />
-                <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
+                <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
+                <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
+                <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
               </svg>
               Share
             </button>
@@ -146,7 +146,6 @@ export default function SaveShareStep({ format, photos, filter, frameColor, onRe
             </button>
           </div>
 
-          {/* Privacy note */}
           {/* Privacy note */}
           <div className="pt-1 border-t border-[#e5e0d8] dark:border-[#3d2f2b] flex flex-col gap-1">
             <p className="text-[10px] text-[#b0a898] dark:text-[#5c4f4a] leading-relaxed">{PRIVACY_NOTE}</p>
