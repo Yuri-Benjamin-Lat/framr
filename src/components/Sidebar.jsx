@@ -103,7 +103,7 @@ export default function Sidebar({ step, isDark, toggleDark }) {
         <div className="mt-auto p-5 border-t border-[#e5e0d8] dark:border-[#3d2f2b]">
           <p className="text-[10px] text-[#b0a898] dark:text-[#5c4f4a] leading-relaxed">{PRIVACY_NOTE}</p>
           <div className="flex justify-between text-[10px] text-[#b0a898] dark:text-[#5c4f4a] mt-2">
-            <button onClick={() => setShowChangelog(true)} className="underline decoration-dotted underline-offset-2 hover:text-[#8B3714] dark:hover:text-[#c4714a] transition-colors">framr v1.0</button>
+            <button onClick={() => setShowChangelog(true)} className="underline decoration-dotted underline-offset-2 hover:text-[#8B3714] dark:hover:text-[#c4714a] transition-colors">framr V1.0.1</button>
             <span>Created by Yuri L.</span>
           </div>
           {showChangelog && <ChangelogModal onClose={() => setShowChangelog(false)} />}

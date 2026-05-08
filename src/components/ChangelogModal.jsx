@@ -2,7 +2,7 @@ import { useState } from 'react'
 
 const V1_RELEASES = [
   {
-    version: 'v1.0',
+    version: 'V1.0.0',
     date: 'May 2025',
     description: 'framr is a browser-based instant photo booth — no app to download, no account needed, and nothing ever leaves your device. Open it, pick a layout, and start shooting.',
     features: [
@@ -17,7 +17,7 @@ const V1_RELEASES = [
     ],
   },
   {
-    version: 'v1.1',
+    version: 'V1.0.1',
     date: 'May 2025',
     description: 'A focused polish update improving the experience on smaller screens and adding visibility into how framr evolves over time.',
     features: [
@@ -83,7 +83,7 @@ export default function ChangelogModal({ onClose }) {
                           onClick={() => setMajor('v2')}
                           className="flex items-center gap-1 text-[10px] text-[#b0a898] dark:text-[#5c4f4a] hover:text-[#8B3714] dark:hover:text-[#c4714a] transition-colors"
                         >
-                          v2.0 <ArrowIcon direction="right" />
+                          V2.0.0 <ArrowIcon direction="right" />
                         </button>
                       )}
                     </div>
@@ -121,11 +121,11 @@ export default function ChangelogModal({ onClose }) {
                     onClick={() => setMajor('v1')}
                     className="flex items-center gap-1 text-[10px] text-[#b0a898] dark:text-[#5c4f4a] hover:text-[#8B3714] dark:hover:text-[#c4714a] transition-colors"
                   >
-                    <ArrowIcon direction="left" /> v1.x
+                    <ArrowIcon direction="left" /> V1.x
                   </button>
                 </div>
                 <div className="flex justify-center">
-                  <span className="font-semibold text-[#1a1614] dark:text-[#ede8e0] text-sm">v2.0</span>
+                  <span className="font-semibold text-[#1a1614] dark:text-[#ede8e0] text-sm">V2.0.0</span>
                 </div>
                 <div />
               </div>
