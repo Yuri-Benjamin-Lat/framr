@@ -12,7 +12,7 @@ const V1_RELEASES = [
   },
   {
     version: 'V1.0.0',
-    date: 'May 2025',
+    date: 'April 2026',
     description: 'framr is a browser-based instant photo booth — no app to download, no account needed, and nothing ever leaves your device. Open it, pick a layout, and start shooting.',
     features: [
       '5 layouts: Polaroid Snap, Vertical Strip, Landscape Sequence, Modern Grid, and Mixed Narrative',
