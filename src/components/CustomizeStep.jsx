@@ -1,13 +1,93 @@
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { FILTERS, FRAME_COLORS } from '../data/formats'
 
 function PrintPreview({ format, photos, filter, frameColor, onPhotosChange }) {
   const [dragIdx, setDragIdx] = useState(null)
+  const [scale, setScale] = useState(1)
+  const [offset, setOffset] = useState({ x: 0, y: 0 })
+  const [panning, setPanning] = useState(false)
+  const containerRef = useRef(null)
+  const contentRef = useRef(null)
+  const scaleRef = useRef(1)
+  const offsetRef = useRef({ x: 0, y: 0 })
+  const panStart = useRef(null)
+  const pinchRef = useRef(null)
 
   const fi = filter.css === 'none' ? undefined : filter.css
   const bg = frameColor.value
   const shadow = '0 8px 40px rgba(0,0,0,0.18)'
   const canDrag = photos.length > 1
+
+  function pushTransform(s, o) {
+    scaleRef.current = s
+    offsetRef.current = o
+    setScale(s)
+    setOffset(o)
+  }
+
+  function maxOff(s) {
+    const c = containerRef.current, e = contentRef.current
+    if (!c || !e) return { x: 0, y: 0 }
+    return {
+      x: Math.abs(e.offsetWidth * s - c.offsetWidth) / 2,
+      y: Math.abs(e.offsetHeight * s - c.offsetHeight) / 2,
+    }
+  }
+
+  function clampOff(x, y, s) {
+    const m = maxOff(s)
+    return { x: Math.min(Math.max(x, -m.x), m.x), y: Math.min(Math.max(y, -m.y), m.y) }
+  }
+
+  useEffect(() => {
+    const el = containerRef.current
+    if (!el) return
+
+    function onWheel(e) {
+      e.preventDefault()
+      const next = Math.min(Math.max(scaleRef.current * (e.deltaY < 0 ? 1.1 : 1 / 1.1), 1), 4)
+      pushTransform(next, next === 1 ? { x: 0, y: 0 } : clampOff(offsetRef.current.x, offsetRef.current.y, next))
+    }
+
+    function onTouchStart(e) {
+      if (e.touches.length === 2) {
+        pinchRef.current = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY)
+      }
+    }
+
+    function onTouchMove(e) {
+      if (e.touches.length !== 2 || pinchRef.current === null) return
+      e.preventDefault()
+      const dist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY)
+      const next = Math.min(Math.max(scaleRef.current * (dist / pinchRef.current), 1), 4)
+      pinchRef.current = dist
+      pushTransform(next, clampOff(offsetRef.current.x, offsetRef.current.y, next))
+    }
+
+    el.addEventListener('wheel', onWheel, { passive: false })
+    el.addEventListener('touchstart', onTouchStart, { passive: true })
+    el.addEventListener('touchmove', onTouchMove, { passive: false })
+    return () => {
+      el.removeEventListener('wheel', onWheel)
+      el.removeEventListener('touchstart', onTouchStart)
+      el.removeEventListener('touchmove', onTouchMove)
+    }
+  }, [])
+
+  function handlePointerDown(e) {
+    e.currentTarget.setPointerCapture(e.pointerId)
+    panStart.current = { x: e.clientX - offsetRef.current.x, y: e.clientY - offsetRef.current.y }
+    setPanning(true)
+  }
+
+  function handlePointerMove(e) {
+    if (!panStart.current) return
+    pushTransform(scaleRef.current, clampOff(e.clientX - panStart.current.x, e.clientY - panStart.current.y, scaleRef.current))
+  }
+
+  function handlePointerUp() { panStart.current = null; setPanning(false) }
+
+  function resetZoom() { pushTransform(1, { x: 0, y: 0 }) }
 
   function handleDragStart(i) { setDragIdx(i) }
   function handleDrop(i) {
@@ -22,13 +102,12 @@ function PrintPreview({ format, photos, filter, frameColor, onPhotosChange }) {
     return (
       <div
         key={i}
-        draggable={canDrag}
-        onDragStart={canDrag ? () => handleDragStart(i) : undefined}
-        onDragOver={canDrag ? e => e.preventDefault() : undefined}
-        onDrop={canDrag ? () => handleDrop(i) : undefined}
+        draggable={canDrag && scale === 1}
+        onDragStart={canDrag && scale === 1 ? () => handleDragStart(i) : undefined}
+        onDragOver={canDrag && scale === 1 ? e => e.preventDefault() : undefined}
+        onDrop={canDrag && scale === 1 ? () => handleDrop(i) : undefined}
         style={{
           width: w, height: h, overflow: 'hidden', filter: fi, flexShrink: 0,
-          cursor: canDrag ? 'grab' : 'default',
           opacity: dragIdx === i ? 0.45 : 1,
           transition: 'opacity 0.15s',
           outline: dragIdx !== null && dragIdx !== i ? '2px dashed rgba(139,55,20,0.4)' : 'none',
@@ -67,8 +146,27 @@ function PrintPreview({ format, photos, filter, frameColor, onPhotosChange }) {
   }
 
   return (
-    <div className="flex-1 flex items-start md:items-center justify-center bg-[#f5f0ea] dark:bg-[#191210] p-6 md:p-8 overflow-auto">
-      {preview}
+    <div
+      ref={containerRef}
+      className="flex-1 flex items-center justify-center bg-[#f5f0ea] dark:bg-[#191210] overflow-hidden relative select-none"
+      style={{ cursor: panning ? 'grabbing' : 'grab' }}
+      onPointerDown={handlePointerDown}
+      onPointerMove={handlePointerMove}
+      onPointerUp={handlePointerUp}
+      onPointerCancel={handlePointerUp}
+    >
+      <div
+        ref={contentRef}
+        style={{ transform: `translate(${offset.x}px, ${offset.y}px) scale(${scale})`, transformOrigin: 'center center', willChange: 'transform' }}
+      >
+        {preview}
+      </div>
+      {scale > 1 && (
+        <div className="absolute bottom-3 right-3 flex items-center gap-1.5 pointer-events-auto">
+          <span className="text-[10px] bg-black/30 text-white px-2 py-1 rounded-full">{Math.round(scale * 100)}%</span>
+          <button onPointerDown={e => e.stopPropagation()} onClick={resetZoom} className="text-[10px] bg-black/30 hover:bg-black/50 text-white px-2 py-1 rounded-full transition-colors">Reset</button>
+        </div>
+      )}
     </div>
   )
 }
@@ -166,7 +264,7 @@ export default function CustomizeStep({
               <p className="text-xs text-[#7a6f68] dark:text-[#8c7e78] mt-0.5">{format.name}</p>
             </div>
           </div>
-          <div className="flex-1 overflow-y-auto p-5">{customizeControls}</div>
+          <div className="flex-1 overflow-y-auto p-5 [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-[#d5cfc8] dark:[&::-webkit-scrollbar-thumb]:bg-[#3d2f2b] [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:hover:bg-[#8B3714] dark:[&::-webkit-scrollbar-thumb]:hover:bg-[#8B3714]">{customizeControls}</div>
           <div className="p-5 border-t border-[#e5e0d8] dark:border-[#3d2f2b] shrink-0 flex flex-col gap-2">
             <button onClick={onNext} className="w-full bg-[#8B3714] text-white py-2.5 rounded-lg font-medium hover:bg-[#732e10] transition-colors">
               Continue →
@@ -192,7 +290,7 @@ export default function CustomizeStep({
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
               </button>
             </div>
-            <div className="flex-1 overflow-y-auto p-5">{customizeControls}</div>
+            <div className="flex-1 overflow-y-auto p-5 [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-[#d5cfc8] dark:[&::-webkit-scrollbar-thumb]:bg-[#3d2f2b] [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:hover:bg-[#8B3714] dark:[&::-webkit-scrollbar-thumb]:hover:bg-[#8B3714]">{customizeControls}</div>
             <div className="p-4 border-t border-[#e5e0d8] dark:border-[#3d2f2b] flex gap-3">
               <button onClick={() => { setSheetOpen(false); setShowBackModal(true) }} className="flex-1 border border-[#e5e0d8] dark:border-[#3d2f2b] text-[#1a1614] dark:text-[#ede8e0] py-2.5 rounded-lg font-medium text-sm hover:bg-[#f5f0ea] dark:hover:bg-[#2c2220] transition-colors">
                 ← Camera
