@@ -6,16 +6,16 @@ const V1_RELEASES = [
     date: 'May 2025',
     majorFeatures: [
       'New Frame Styles',
-      'New Stickes',
+      'New Stickers',
       'Frame colors: Reworked and Additions',
       'Filters: Reworked and Additions',
     ],
     minorFeatures: [
       'Improved layouts and spacing on mobile and tablet screens',
       'Introduced this changelog, accessible from the footer',
-      'Square crop guide overlay for square layouts',
       'Zoom and Drag photo for customization step',
       'Fully responsive for all screen sizes',
+      'Crop guide overlay for all layouts',
     ],
   },
   {
