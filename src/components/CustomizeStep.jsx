@@ -180,48 +180,73 @@ export default function CustomizeStep({
 }) {
   const [showBackModal, setShowBackModal] = useState(false)
   const [sheetOpen, setSheetOpen] = useState(false)
+  const [filterOpen, setFilterOpen] = useState(true)
+  const [frameOpen, setFrameOpen] = useState(true)
 
   const customizeControls = (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-3">
       {format.photoCount > 1 && (
         <p className="text-xs text-[#7a6f68] dark:text-[#8c7e78]">Drag photos in the preview to reorder them.</p>
       )}
-      <div>
-        <p className="text-xs font-semibold text-[#7a6f68] dark:text-[#8c7e78] uppercase tracking-wider mb-3">Filter</p>
-        <div className="grid grid-cols-2 gap-2">
-          {FILTERS.map(f => (
-            <button
-              key={f.id}
-              onClick={() => onFilterChange(f)}
-              className={`rounded-lg overflow-hidden border-2 transition-all ${
-                filter.id === f.id
-                  ? 'border-[#8B3714]'
-                  : 'border-[#e5e0d8] dark:border-[#3d2f2b] hover:border-[#c5bfb8] dark:hover:border-[#5a4a46]'
-              }`}
-            >
-              <div style={{ height: 52, background: '#2d3748', filter: f.css === 'none' ? undefined : f.css }} />
-              <p className={`text-xs py-1.5 text-center bg-white dark:bg-[#221a18] ${filter.id === f.id ? 'text-[#8B3714] dark:text-[#c4643a] font-medium' : 'text-[#7a6f68] dark:text-[#8c7e78]'}`}>
-                {f.name}
-              </p>
-            </button>
-          ))}
-        </div>
+      <div className="border border-[#e5e0d8] dark:border-[#3d2f2b] rounded-xl overflow-hidden">
+        <button
+          onClick={() => setFilterOpen(o => !o)}
+          className="w-full flex items-center justify-between px-4 py-3 bg-[#faf8f5] dark:bg-[#1e1714] hover:bg-[#f5f0ea] dark:hover:bg-[#251e1b] transition-colors"
+        >
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-semibold text-[#7a6f68] dark:text-[#8c7e78] uppercase tracking-wider">Filter</span>
+            <span className="text-xs text-[#8B3714] dark:text-[#c4643a]">{filter.name}</span>
+          </div>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={`text-[#7a6f68] dark:text-[#8c7e78] transition-transform ${filterOpen ? 'rotate-180' : ''}`}><path d="M6 9l6 6 6-6"/></svg>
+        </button>
+        {filterOpen && (
+          <div className="p-3 border-t border-[#e5e0d8] dark:border-[#3d2f2b] grid grid-cols-2 gap-2">
+            {FILTERS.map(f => (
+              <button
+                key={f.id}
+                onClick={() => onFilterChange(f)}
+                className={`rounded-lg overflow-hidden border-2 transition-all ${
+                  filter.id === f.id
+                    ? 'border-[#8B3714]'
+                    : 'border-[#e5e0d8] dark:border-[#3d2f2b] hover:border-[#c5bfb8] dark:hover:border-[#5a4a46]'
+                }`}
+              >
+                <div style={{ height: 52, background: '#2d3748', filter: f.css === 'none' ? undefined : f.css }} />
+                <p className={`text-xs py-1.5 text-center bg-white dark:bg-[#221a18] ${filter.id === f.id ? 'text-[#8B3714] dark:text-[#c4643a] font-medium' : 'text-[#7a6f68] dark:text-[#8c7e78]'}`}>
+                  {f.name}
+                </p>
+              </button>
+            ))}
+          </div>
+        )}
       </div>
-      <div>
-        <p className="text-xs font-semibold text-[#7a6f68] dark:text-[#8c7e78] uppercase tracking-wider mb-3">Frame Color</p>
-        <div className="flex gap-2 flex-wrap">
-          {FRAME_COLORS.map(fc => (
-            <button
-              key={fc.id}
-              onClick={() => onFrameColorChange(fc)}
-              title={fc.label}
-              style={{ backgroundColor: fc.value }}
-              className={`w-9 h-9 rounded-full border-2 transition-all ${
-                frameColor.id === fc.id ? 'border-[#8B3714] scale-110' : 'border-[#e5e0d8] dark:border-[#3d2f2b] hover:border-[#c5bfb8]'
-              }`}
-            />
-          ))}
-        </div>
+
+      <div className="border border-[#e5e0d8] dark:border-[#3d2f2b] rounded-xl overflow-hidden">
+        <button
+          onClick={() => setFrameOpen(o => !o)}
+          className="w-full flex items-center justify-between px-4 py-3 bg-[#faf8f5] dark:bg-[#1e1714] hover:bg-[#f5f0ea] dark:hover:bg-[#251e1b] transition-colors"
+        >
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-semibold text-[#7a6f68] dark:text-[#8c7e78] uppercase tracking-wider">Frame Color</span>
+            <span className="w-3 h-3 rounded-full border border-black/10 inline-block" style={{ backgroundColor: frameColor.value }} />
+          </div>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={`text-[#7a6f68] dark:text-[#8c7e78] transition-transform ${frameOpen ? 'rotate-180' : ''}`}><path d="M6 9l6 6 6-6"/></svg>
+        </button>
+        {frameOpen && (
+          <div className="p-3 border-t border-[#e5e0d8] dark:border-[#3d2f2b] flex gap-2 flex-wrap">
+            {FRAME_COLORS.map(fc => (
+              <button
+                key={fc.id}
+                onClick={() => onFrameColorChange(fc)}
+                title={fc.label}
+                style={{ backgroundColor: fc.value }}
+                className={`w-9 h-9 rounded-full border-2 transition-all ${
+                  frameColor.id === fc.id ? 'border-[#8B3714] scale-110' : 'border-[#e5e0d8] dark:border-[#3d2f2b] hover:border-[#c5bfb8]'
+                }`}
+              />
+            ))}
+          </div>
+        )}
       </div>
     </div>
   )
@@ -266,7 +291,7 @@ export default function CustomizeStep({
               <p className="text-xs text-[#7a6f68] dark:text-[#8c7e78] mt-0.5">{format.name}</p>
             </div>
           </div>
-          <div className="flex-1 overflow-y-auto p-5 [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-[#d5cfc8] dark:[&::-webkit-scrollbar-thumb]:bg-[#3d2f2b] [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:hover:bg-[#8B3714] dark:[&::-webkit-scrollbar-thumb]:hover:bg-[#8B3714]">{customizeControls}</div>
+          <div className="flex-1 overflow-y-auto p-2.5 [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-[#d5cfc8] dark:[&::-webkit-scrollbar-thumb]:bg-[#3d2f2b] [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:hover:bg-[#8B3714] dark:[&::-webkit-scrollbar-thumb]:hover:bg-[#8B3714]">{customizeControls}</div>
           <div className="p-5 border-t border-[#e5e0d8] dark:border-[#3d2f2b] shrink-0 flex flex-col gap-2">
             <button onClick={onNext} className="w-full bg-[#8B3714] text-white py-2.5 rounded-lg font-medium hover:bg-[#732e10] transition-colors">
               Continue →
@@ -292,7 +317,7 @@ export default function CustomizeStep({
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
               </button>
             </div>
-            <div className="flex-1 overflow-y-auto p-5 [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-[#d5cfc8] dark:[&::-webkit-scrollbar-thumb]:bg-[#3d2f2b] [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:hover:bg-[#8B3714] dark:[&::-webkit-scrollbar-thumb]:hover:bg-[#8B3714]">{customizeControls}</div>
+            <div className="flex-1 overflow-y-auto p-2.5 [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-[#d5cfc8] dark:[&::-webkit-scrollbar-thumb]:bg-[#3d2f2b] [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:hover:bg-[#8B3714] dark:[&::-webkit-scrollbar-thumb]:hover:bg-[#8B3714]">{customizeControls}</div>
             <div className="p-4 border-t border-[#e5e0d8] dark:border-[#3d2f2b] flex gap-3">
               <button onClick={() => { setSheetOpen(false); setShowBackModal(true) }} className="flex-1 border border-[#e5e0d8] dark:border-[#3d2f2b] text-[#1a1614] dark:text-[#ede8e0] py-2.5 rounded-lg font-medium text-sm hover:bg-[#f5f0ea] dark:hover:bg-[#2c2220] transition-colors">
                 ← Camera
