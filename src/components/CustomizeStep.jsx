@@ -45,8 +45,8 @@ function PrintPreview({ format, photos, filter, frameColor, onPhotosChange }) {
 
     function onWheel(e) {
       e.preventDefault()
-      const next = Math.min(Math.max(scaleRef.current * (e.deltaY < 0 ? 1.1 : 1 / 1.1), 1), 4)
-      pushTransform(next, next === 1 ? { x: 0, y: 0 } : clampOff(offsetRef.current.x, offsetRef.current.y, next))
+      const next = Math.min(Math.max(scaleRef.current * (e.deltaY < 0 ? 1.05 : 1 / 1.05), 0.25), 4)
+      pushTransform(next, clampOff(offsetRef.current.x, offsetRef.current.y, next))
     }
 
     function onTouchStart(e) {
@@ -59,7 +59,7 @@ function PrintPreview({ format, photos, filter, frameColor, onPhotosChange }) {
       if (e.touches.length !== 2 || pinchRef.current === null) return
       e.preventDefault()
       const dist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY)
-      const next = Math.min(Math.max(scaleRef.current * (dist / pinchRef.current), 1), 4)
+      const next = Math.min(Math.max(scaleRef.current * (dist / pinchRef.current), 0.25), 4)
       pinchRef.current = dist
       pushTransform(next, clampOff(offsetRef.current.x, offsetRef.current.y, next))
     }
@@ -161,9 +161,11 @@ function PrintPreview({ format, photos, filter, frameColor, onPhotosChange }) {
       >
         {preview}
       </div>
-      {scale > 1 && (
+      {scale !== 1 && (
         <div className="absolute bottom-3 right-3 flex items-center gap-1.5 pointer-events-auto">
-          <span className="text-[10px] bg-black/30 text-white px-2 py-1 rounded-full">{Math.round(scale * 100)}%</span>
+          <span className="text-[10px] bg-black/30 text-white px-2 py-1 rounded-full">
+            {scale >= 1 ? Math.round(scale * 100) : Math.round((scale - 1) * 100)}%
+          </span>
           <button onPointerDown={e => e.stopPropagation()} onClick={resetZoom} className="text-[10px] bg-black/30 hover:bg-black/50 text-white px-2 py-1 rounded-full transition-colors">Reset</button>
         </div>
       )}
