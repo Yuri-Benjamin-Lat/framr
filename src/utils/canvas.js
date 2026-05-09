@@ -113,5 +113,13 @@ export async function compositePhoto({ photos, format, filter, frameColor, frame
     }
   }
 
+  if (fsId === 'rounded') {
+    ctx.globalCompositeOperation = 'destination-in'
+    traceFramePath(ctx, canvas.width, canvas.height, 'rounded')
+    ctx.fillStyle = '#000'
+    ctx.fill()
+    ctx.globalCompositeOperation = 'source-over'
+  }
+
   return canvas.toDataURL('image/png')
 }

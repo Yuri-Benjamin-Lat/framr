@@ -8,6 +8,7 @@ export default function SaveShareStep({ format, photos, filter, frameColor, fram
   const [outputUrl, setOutputUrl] = useState(null)
   const [generating, setGenerating] = useState(true)
   const [showChangelog, setShowChangelog] = useState(false)
+  const [copied, setCopied] = useState(false)
 
   useEffect(() => {
     compositePhoto({ photos, format, filter, frameColor, frameStyle }).then(url => {
@@ -23,27 +24,19 @@ export default function SaveShareStep({ format, photos, filter, frameColor, fram
     a.click()
   }
 
-  function downloadJpeg() {
-    const img = new Image()
-    img.onload = () => {
-      const c = document.createElement('canvas')
-      c.width = img.width; c.height = img.height
-      const ctx = c.getContext('2d')
-      ctx.fillStyle = '#ffffff'
-      ctx.fillRect(0, 0, c.width, c.height)
-      ctx.drawImage(img, 0, 0)
-      const a = document.createElement('a')
-      a.href = c.toDataURL('image/jpeg', 0.92)
-      a.download = `framr-${format.id}.jpg`
-      a.click()
-    }
-    img.src = outputUrl
-  }
-
-  function print() {
+function print() {
     const win = window.open('', '_blank')
     win.document.write(`<html><head><title>framr</title><style>body{margin:0;display:flex;justify-content:center;align-items:center;min-height:100vh;background:#fff;}img{max-width:100%;max-height:100vh;object-fit:contain;}</style></head><body><img src="${outputUrl}" onload="window.print();window.close();" /></body></html>`)
     win.document.close()
+  }
+
+  async function copyToClipboard() {
+    try {
+      const blob = await (await fetch(outputUrl)).blob()
+      await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })])
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    } catch (_) {}
   }
 
   async function share() {
@@ -114,12 +107,24 @@ export default function SaveShareStep({ format, photos, filter, frameColor, fram
           <div className="flex flex-col gap-2">
             <p className="text-xs font-semibold text-[#7a6f68] dark:text-[#8c7e78] uppercase tracking-wider">Download</p>
             <button onClick={downloadPng} className={btnPrimary}>{iconDown} Download PNG</button>
-            <button onClick={downloadJpeg} className={btnSecondary}>{iconDown} Download JPEG</button>
           </div>
 
           {/* Other */}
           <div className="flex flex-col gap-2">
             <p className="text-xs font-semibold text-[#7a6f68] dark:text-[#8c7e78] uppercase tracking-wider">Other</p>
+            <button onClick={copyToClipboard} className={btnSecondary}>
+              {copied ? (
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="20 6 9 17 4 12"/>
+                </svg>
+              ) : (
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                </svg>
+              )}
+              {copied ? 'Copied!' : 'Copy'}
+            </button>
             <button onClick={print} className={btnSecondary}>
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <polyline points="6 9 6 2 18 2 18 9"/>
@@ -152,7 +157,7 @@ export default function SaveShareStep({ format, photos, filter, frameColor, fram
           <div className="pt-1 border-t border-[#e5e0d8] dark:border-[#3d2f2b] flex flex-col gap-1">
             <p className="text-[10px] text-[#b0a898] dark:text-[#5c4f4a] leading-relaxed">{PRIVACY_NOTE}</p>
             <div className="flex justify-between text-[10px] text-[#b0a898] dark:text-[#5c4f4a]">
-              <button onClick={() => setShowChangelog(true)} className="underline decoration-dotted underline-offset-2 hover:text-[#8B3714] dark:hover:text-[#c4714a] transition-colors">framr V1.0.1</button>
+              <button onClick={() => setShowChangelog(true)} className="underline decoration-dotted underline-offset-2 hover:text-[#8B3714] dark:hover:text-[#c4714a] transition-colors">framr V1.1.0</button>
               <span>Created by Yuri L.</span>
             </div>
             {showChangelog && <ChangelogModal onClose={() => setShowChangelog(false)} />}
