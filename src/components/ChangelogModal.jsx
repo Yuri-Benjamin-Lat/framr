@@ -5,9 +5,10 @@ const V1_RELEASES = [
     version: 'V1.1.0',
     date: 'May 2025',
     majorFeatures: [
-      'New Frame Style customizations',
-      'Reworked and added new Frame color customizations',
-      'Reworked and added new Filter customizations',
+      'New Frame Styles',
+      'New Stickes',
+      'Frame colors: Reworked and Additions',
+      'Filters: Reworked and Additions',
     ],
     minorFeatures: [
       'Improved layouts and spacing on mobile and tablet screens',
@@ -22,9 +23,9 @@ const V1_RELEASES = [
     date: 'April 2026',
     description: 'framr is a browser-based instant photo booth — no app to download, no account needed, and nothing ever leaves your device. Open it, pick a layout, and start shooting.',
     majorFeatures: [
-      'Layout strip customizations',
-      'Frame color customizations',
-      'Filter customizations',
+      'Layout strips',
+      'Frame colors',
+      'Filters',
     ],
     minorFeatures: [
       'Camera with auto-shoot mode, countdown timer, and front/back flip',
