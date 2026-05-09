@@ -17,9 +17,10 @@ function StarSvg({ size }) {
   )
 }
 
-function frameClipStyle(styleId) {
-  if (styleId === 'rounded') return { borderRadius: '5%' }
-  return {}
+function frameClipStyle(styleId, overflow) {
+  const s = styleId === 'rounded' ? { borderRadius: '5%' } : {}
+  if (!overflow) s.overflow = 'hidden'
+  return s
 }
 
 function getPreviewSlots(format) {
@@ -57,7 +58,7 @@ function getPreviewSlots(format) {
   }
 }
 
-export default function PrintPreview({ format, photos, filter, frameColor, frameStyle, onPhotosChange, layers = [], onLayersChange, selectedLayerId = null, onSelectLayer }) {
+export default function PrintPreview({ format, photos, filter, frameColor, frameStyle, onPhotosChange, layers = [], onLayersChange, selectedLayerId = null, onSelectLayer, stickerOverflow = false }) {
   const [dragIdx, setDragIdx] = useState(null)
   const [scale, setScale] = useState(1)
   const [offset, setOffset] = useState({ x: 0, y: 0 })
@@ -300,7 +301,7 @@ export default function PrintPreview({ format, photos, filter, frameColor, frame
     )
   }
 
-  const clip = frameClipStyle(frameStyle.id)
+  const clip = frameClipStyle(frameStyle.id, stickerOverflow)
   let preview = null
   switch (format.layout) {
     case 'polaroid':

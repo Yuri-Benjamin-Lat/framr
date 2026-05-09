@@ -92,7 +92,7 @@ function drawCover(ctx, img, x, y, w, h) {
   ctx.drawImage(img, sx, sy, sw, sh, x, y, w, h)
 }
 
-export async function compositePhoto({ photos, format, filter, frameColor, frameStyle, layers = [] }) {
+export async function compositePhoto({ photos, format, filter, frameColor, frameStyle, layers = [], stickerOverflow = false }) {
   const images = await Promise.all(photos.map(loadImage))
   const canvas = document.createElement('canvas')
   const ctx = canvas.getContext('2d')
@@ -181,15 +181,32 @@ export async function compositePhoto({ photos, format, filter, frameColor, frame
   const baseDiameter = (48 / (PREVIEW_FRAME_W[format.layout] ?? 400)) * canvas.width * 0.9
   const outerR = Math.round(baseDiameter * 0.45)
   const innerR = Math.round(baseDiameter * 0.19)
+
+  // Draw frame overlay layers only (stickers handled separately below)
   ;[...layers].reverse().forEach(layer => {
     if (layer.type === 'photo') return
     if (layer.type === 'frame') drawFrameOverlay(ctx, canvas.width, canvas.height, fc, fsId, slots)
-    else if (layer.type === 'star') {
-      const m = layer.size ?? 1
-      drawStarOnCanvas(ctx, layer.x * canvas.width, layer.y * canvas.height, outerR * m, innerR * m)
-    }
   })
 
+  const stickerLayers = [...layers].reverse().filter(l => l.type === 'star')
+
+  if (!stickerOverflow || stickerLayers.length === 0) {
+    // Clip mode: draw stickers on the frame canvas so they're clipped at its boundary
+    stickerLayers.forEach(layer => {
+      const m = layer.size ?? 1
+      drawStarOnCanvas(ctx, layer.x * canvas.width, layer.y * canvas.height, outerR * m, innerR * m)
+    })
+    if (fsId === 'rounded') {
+      ctx.globalCompositeOperation = 'destination-in'
+      traceFramePath(ctx, canvas.width, canvas.height, 'rounded')
+      ctx.fillStyle = '#000'
+      ctx.fill()
+      ctx.globalCompositeOperation = 'source-over'
+    }
+    return canvas.toDataURL('image/png')
+  }
+
+  // Overflow mode: clip frame to rounded shape first, then extend canvas for stickers
   if (fsId === 'rounded') {
     ctx.globalCompositeOperation = 'destination-in'
     traceFramePath(ctx, canvas.width, canvas.height, 'rounded')
@@ -198,5 +215,32 @@ export async function compositePhoto({ photos, format, filter, frameColor, frame
     ctx.globalCompositeOperation = 'source-over'
   }
 
-  return canvas.toDataURL('image/png')
+  const fW = canvas.width, fH = canvas.height
+  let padL = 0, padR = 0, padT = 0, padB = 0
+  stickerLayers.forEach(layer => {
+    const m = layer.size ?? 1
+    const r = outerR * m
+    const cx = layer.x * fW
+    const cy = layer.y * fH
+    if (cx - r < 0) padL = Math.max(padL, Math.ceil(r - cx))
+    if (cx + r > fW) padR = Math.max(padR, Math.ceil(cx + r - fW))
+    if (cy - r < 0) padT = Math.max(padT, Math.ceil(r - cy))
+    if (cy + r > fH) padB = Math.max(padB, Math.ceil(cy + r - fH))
+  })
+
+  const out = document.createElement('canvas')
+  out.width = fW + padL + padR
+  out.height = fH + padT + padB
+  const octx = out.getContext('2d')
+
+  // Frame sits at (padL, padT); the surrounding area stays transparent
+  octx.drawImage(canvas, padL, padT)
+
+  // Draw stickers on the expanded canvas, fully visible even outside the frame
+  stickerLayers.forEach(layer => {
+    const m = layer.size ?? 1
+    drawStarOnCanvas(octx, padL + layer.x * fW, padT + layer.y * fH, outerR * m, innerR * m)
+  })
+
+  return out.toDataURL('image/png')
 }

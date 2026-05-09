@@ -30,8 +30,8 @@ function StyleIcon({ id, active }) {
 
 
 export default function CustomizeStep({
-  format, photos, filter, frameColor, frameStyle, layers,
-  onFilterChange, onFrameColorChange, onFrameStyleChange, onPhotosChange, onLayersChange,
+  format, photos, filter, frameColor, frameStyle, layers, stickerOverflow,
+  onFilterChange, onFrameColorChange, onFrameStyleChange, onPhotosChange, onLayersChange, onStickerOverflowChange,
   onNext, onBack,
 }) {
   const [showBackModal, setShowBackModal] = useState(false)
@@ -251,7 +251,20 @@ export default function CustomizeStep({
 
             {/* Layer panel */}
             <div className="border-t border-[#e5e0d8] dark:border-[#3d2f2b] p-3 flex flex-col gap-1.5">
-              <p className="text-[10px] font-semibold text-[#7a6f68] dark:text-[#8c7e78] uppercase tracking-wider mb-1">Layers</p>
+              <div className="flex items-center justify-between mb-1">
+                <p className="text-[10px] font-semibold text-[#7a6f68] dark:text-[#8c7e78] uppercase tracking-wider">Layers</p>
+                <button
+                  onClick={() => onStickerOverflowChange(!stickerOverflow)}
+                  title={stickerOverflow ? 'Overflow on — stickers hang off edges' : 'Overflow off — stickers clipped to frame'}
+                  className={`flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-semibold border transition-colors ${
+                    stickerOverflow
+                      ? 'bg-[#8B3714] text-white border-[#8B3714]'
+                      : 'bg-transparent text-[#7a6f68] dark:text-[#8c7e78] border-[#d5cfc8] dark:border-[#4a3a36] hover:border-[#8B3714] hover:text-[#8B3714]'
+                  }`}
+                >
+                  Overflow
+                </button>
+              </div>
               <div className="flex flex-col gap-1 max-h-48 overflow-y-auto [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-[#d5cfc8] dark:[&::-webkit-scrollbar-thumb]:bg-[#3d2f2b] [&::-webkit-scrollbar-thumb]:rounded-full">
                 {layers.map((layer, i) => {
                   const isSticker = layer.type !== 'photo' && layer.type !== 'frame'
@@ -353,7 +366,7 @@ export default function CustomizeStep({
           </button>
         </div>
 
-        <PrintPreview format={format} photos={photos} filter={filter} frameColor={frameColor} frameStyle={frameStyle} onPhotosChange={onPhotosChange} layers={layers} onLayersChange={onLayersChange} selectedLayerId={selectedLayerId} onSelectLayer={setSelectedLayerId} />
+        <PrintPreview format={format} photos={photos} filter={filter} frameColor={frameColor} frameStyle={frameStyle} onPhotosChange={onPhotosChange} layers={layers} onLayersChange={onLayersChange} selectedLayerId={selectedLayerId} onSelectLayer={setSelectedLayerId} stickerOverflow={stickerOverflow} />
 
         <div className="shrink-0 bg-white dark:bg-[#221a18] border-t border-[#e5e0d8] dark:border-[#3d2f2b] px-4 py-3">
           <button
@@ -368,7 +381,7 @@ export default function CustomizeStep({
 
       {/* ── Desktop/tablet layout ── */}
       <div className="hidden md:flex h-full w-full">
-        <PrintPreview format={format} photos={photos} filter={filter} frameColor={frameColor} frameStyle={frameStyle} onPhotosChange={onPhotosChange} layers={layers} onLayersChange={onLayersChange} selectedLayerId={selectedLayerId} onSelectLayer={setSelectedLayerId} />
+        <PrintPreview format={format} photos={photos} filter={filter} frameColor={frameColor} frameStyle={frameStyle} onPhotosChange={onPhotosChange} layers={layers} onLayersChange={onLayersChange} selectedLayerId={selectedLayerId} onSelectLayer={setSelectedLayerId} stickerOverflow={stickerOverflow} />
 
         <div className="w-72 shrink-0 border-l border-[#e5e0d8] dark:border-[#3d2f2b] bg-white dark:bg-[#221a18] flex flex-col overflow-hidden">
           <div className="h-16 px-5 border-b border-[#e5e0d8] dark:border-[#3d2f2b] flex items-center shrink-0">

@@ -19,6 +19,7 @@ export default function App() {
     { id: 'photo', type: 'photo', label: 'Photo' },
     { id: 'frame', type: 'frame', label: 'Frame' },
   ])
+  const [stickerOverflow, setStickerOverflow] = useState(false)
   const [isDark, setIsDark] = useState(() => localStorage.getItem('theme') === 'dark')
 
   useEffect(() => {
@@ -50,6 +51,7 @@ export default function App() {
     setFrameStyle(FRAME_STYLES[0])
     setLayers([{ id: 'photo', type: 'photo', label: 'Photo' }, { id: 'frame', type: 'frame', label: 'Frame' }])
     setFormat(FORMATS[0])
+    setStickerOverflow(false)
   }
 
   if (showSplash) {
@@ -85,6 +87,8 @@ export default function App() {
             onPhotosChange={setPhotos}
             layers={layers}
             onLayersChange={setLayers}
+            stickerOverflow={stickerOverflow}
+            onStickerOverflowChange={setStickerOverflow}
             onNext={goNext}
             onBack={goBackFromCustomize}
           />
@@ -97,6 +101,7 @@ export default function App() {
             frameColor={frameColor}
             frameStyle={frameStyle}
             layers={layers}
+            stickerOverflow={stickerOverflow}
             onRestart={restart}
             onBack={goBack}
           />
