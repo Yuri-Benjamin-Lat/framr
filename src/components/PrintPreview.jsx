@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 
 const STICKER_SIZE = 48
+const IMPORT_BASE_PX = 80
 
 function StarSvg({ size }) {
   const cx = size / 2, cy = size / 2
@@ -72,6 +73,8 @@ export default function PrintPreview({ format, photos, filter, frameColor, frame
   const frameRef = useRef(null)
   const dragStickerRef = useRef(null)
   const isClickRef = useRef(false)
+  const rotatingStickerRef = useRef(null)
+  const resizingStickerRef = useRef(null)
 
   const fi = filter.css === 'none' ? undefined : filter.css
   const bg = frameColor.value
@@ -182,6 +185,51 @@ export default function PrintPreview({ format, photos, filter, frameColor, frame
 
   function resetZoom() { pushTransform(1, { x: 0, y: 0 }) }
 
+  function handleStickerRotateStart(e, stickerId) {
+    e.stopPropagation()
+    e.currentTarget.setPointerCapture(e.pointerId)
+    const frameEl = frameRef.current
+    const frameRect = frameEl.getBoundingClientRect()
+    const sticker = layers.find(l => l.id === stickerId)
+    const centerX = frameRect.left + sticker.x * frameRect.width
+    const centerY = frameRect.top + sticker.y * frameRect.height
+    const startAngle = Math.atan2(e.clientY - centerY, e.clientX - centerX) * 180 / Math.PI
+    rotatingStickerRef.current = { id: stickerId, centerX, centerY, startAngle, startRotation: sticker.rotation ?? 0 }
+  }
+
+  function handleStickerRotateMove(e) {
+    if (!rotatingStickerRef.current) return
+    const { id, centerX, centerY, startAngle, startRotation } = rotatingStickerRef.current
+    let angle = Math.atan2(e.clientY - centerY, e.clientX - centerX) * 180 / Math.PI
+    let delta = angle - startAngle
+    if (delta > 180) delta -= 360
+    if (delta < -180) delta += 360
+    onLayersChange(layers.map(l => l.id === id ? { ...l, rotation: startRotation + delta } : l))
+  }
+
+  function handleStickerRotateEnd() { rotatingStickerRef.current = null }
+
+  function handleStickerResizeStart(e, stickerId) {
+    e.stopPropagation()
+    e.currentTarget.setPointerCapture(e.pointerId)
+    const frameEl = frameRef.current
+    const frameRect = frameEl.getBoundingClientRect()
+    const sticker = layers.find(l => l.id === stickerId)
+    const centerX = frameRect.left + sticker.x * frameRect.width
+    const centerY = frameRect.top + sticker.y * frameRect.height
+    const startDist = Math.hypot(e.clientX - centerX, e.clientY - centerY)
+    resizingStickerRef.current = { id: stickerId, centerX, centerY, startDist: Math.max(startDist, 1), startSize: sticker.size ?? 1 }
+  }
+
+  function handleStickerResizeMove(e) {
+    if (!resizingStickerRef.current) return
+    const { id, centerX, centerY, startDist, startSize } = resizingStickerRef.current
+    const dist = Math.hypot(e.clientX - centerX, e.clientY - centerY)
+    onLayersChange(layers.map(l => l.id === id ? { ...l, size: Math.min(3, Math.max(0.3, startSize * (dist / startDist))) } : l))
+  }
+
+  function handleStickerResizeEnd() { resizingStickerRef.current = null }
+
   function handleStickerPointerDown(e, sticker) {
     e.stopPropagation()
     e.currentTarget.setPointerCapture(e.pointerId)
@@ -190,7 +238,14 @@ export default function PrintPreview({ format, photos, filter, frameColor, frame
     const s = scaleRef.current
     const fw = frameRef.current.offsetWidth
     const fh = frameRef.current.offsetHeight
-    const half = Math.round((sticker.size ?? 1) * STICKER_SIZE) / 2
+    let half
+    if (sticker.type === 'import') {
+      const w = Math.round((sticker.size ?? 1) * IMPORT_BASE_PX)
+      const h = Math.round(w / (sticker.aspectRatio ?? 1))
+      half = Math.max(w, h) / 2
+    } else {
+      half = Math.round((sticker.size ?? 1) * STICKER_SIZE) / 2
+    }
     dragStickerRef.current = {
       id: sticker.id,
       dx: (e.clientX - rect.left) / s - sticker.x * fw,
@@ -216,87 +271,113 @@ export default function PrintPreview({ format, photos, filter, frameColor, frame
   function stickerLayer() {
     if (!stickers.length) return null
     return stickers.map(sticker => {
-      const sz = Math.round((sticker.size ?? 1) * STICKER_SIZE)
+      let dispW, dispH
+      if (sticker.type === 'import') {
+        dispW = Math.round((sticker.size ?? 1) * IMPORT_BASE_PX)
+        dispH = Math.round(dispW / (sticker.aspectRatio ?? 1))
+      } else {
+        dispW = dispH = Math.round((sticker.size ?? 1) * STICKER_SIZE)
+      }
+      const isSelected = selectedLayerId === sticker.id
+      const rotation = sticker.rotation ?? 0
       return (
         <div
           key={sticker.id}
           style={{
             position: 'absolute',
-            left: `calc(${sticker.x * 100}% - ${sz / 2}px)`,
-            top: `calc(${sticker.y * 100}% - ${sz / 2}px)`,
-            width: sz,
-            height: sz,
+            left: `calc(${sticker.x * 100}% - ${dispW / 2}px)`,
+            top: `calc(${sticker.y * 100}% - ${dispH / 2}px)`,
+            width: dispW,
+            height: dispH,
             cursor: 'move',
             zIndex: getZIndex(sticker.id),
             userSelect: 'none',
             touchAction: 'none',
+            transform: `rotate(${rotation}deg)`,
+            transformOrigin: 'center center',
           }}
           onPointerDown={e => handleStickerPointerDown(e, sticker)}
           onPointerMove={handleStickerPointerMove}
           onPointerUp={handleStickerPointerUp}
           onPointerCancel={handleStickerPointerUp}
         >
-          <StarSvg size={sz} />
+          {sticker.type === 'star' && <StarSvg size={dispW} />}
+          {sticker.type === 'import' && (
+            <img src={sticker.src} alt="" draggable={false} style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block', userSelect: 'none', pointerEvents: 'none' }} />
+          )}
+          {isSelected && (
+            <>
+              <div style={{ position: 'absolute', inset: -2, border: '1.5px dashed #8B3714', borderRadius: 2, pointerEvents: 'none', zIndex: 1 }} />
+              <div
+                style={{
+                  position: 'absolute', bottom: 2, right: 2,
+                  width: 18, height: 18, borderRadius: '50%',
+                  background: '#8B3714', border: '1.5px solid white',
+                  cursor: 'grab', touchAction: 'none',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  zIndex: 2,
+                }}
+                onPointerDown={e => handleStickerRotateStart(e, sticker.id)}
+                onPointerMove={handleStickerRotateMove}
+                onPointerUp={handleStickerRotateEnd}
+                onPointerCancel={handleStickerRotateEnd}
+              >
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M21.5 2v6h-6"/><path d="M21.34 15.57a10 10 0 1 1-.57-8.38"/>
+                </svg>
+              </div>
+              <div
+                style={{
+                  position: 'absolute', top: 2, right: 2,
+                  width: 18, height: 18, borderRadius: 3,
+                  background: '#8B3714', border: '1.5px solid white',
+                  cursor: 'nwse-resize', touchAction: 'none',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  zIndex: 2,
+                }}
+                onPointerDown={e => handleStickerResizeStart(e, sticker.id)}
+                onPointerMove={handleStickerResizeMove}
+                onPointerUp={handleStickerResizeEnd}
+                onPointerCancel={handleStickerResizeEnd}
+              >
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M15 3h6v6"/><path d="M9 21H3v-6"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/>
+                </svg>
+              </div>
+            </>
+          )}
         </div>
       )
     })
   }
 
-  function selectionIndicator() {
-    if (!selectedLayerId) return null
-    const sticker = stickers.find(s => s.id === selectedLayerId)
-    if (!sticker) return null
-    const size = Math.round((sticker.size ?? 1) * STICKER_SIZE)
-    return (
-      <div
-        key="sel"
-        style={{
-          position: 'absolute',
-          left: `calc(${sticker.x * 100}% - ${size / 2}px)`,
-          top: `calc(${sticker.y * 100}% - ${size / 2}px)`,
-          width: size,
-          height: size,
-          border: '1px dashed #8B3714',
-          borderRadius: 2,
-          zIndex: 9999,
-          cursor: 'move',
-          boxSizing: 'border-box',
-          pointerEvents: 'all',
-        }}
-        onPointerDown={e => handleStickerPointerDown(e, sticker)}
-        onPointerMove={handleStickerPointerMove}
-        onPointerUp={handleStickerPointerUp}
-        onPointerCancel={handleStickerPointerUp}
-      />
-    )
-  }
-
   function handleDragStart(i) { setDragIdx(i) }
   function handleDrop(i) {
     if (dragIdx === null || dragIdx === i) { setDragIdx(null); return }
-    const next = [...photos]
-    ;[next[dragIdx], next[i]] = [next[i], next[dragIdx]]
-    onPhotosChange(next)
+    const nextPhotos = [...photos]
+    ;[nextPhotos[dragIdx], nextPhotos[i]] = [nextPhotos[i], nextPhotos[dragIdx]]
+    onPhotosChange(nextPhotos)
     setDragIdx(null)
   }
 
   function slot(src, w, h, i) {
+    const canDragSlot = canDrag && scale === 1
     return (
       <div
         key={i}
-        draggable={canDrag && scale === 1}
-        onDragStart={canDrag && scale === 1 ? () => handleDragStart(i) : undefined}
-        onDragOver={canDrag && scale === 1 ? e => e.preventDefault() : undefined}
-        onDrop={canDrag && scale === 1 ? () => handleDrop(i) : undefined}
+        draggable={canDragSlot}
+        onDragStart={canDragSlot ? () => handleDragStart(i) : undefined}
+        onDragOver={canDragSlot ? e => e.preventDefault() : undefined}
+        onDrop={canDragSlot ? () => handleDrop(i) : undefined}
         style={{
-          width: w, height: h, overflow: 'hidden', filter: fi, flexShrink: 0,
+          width: w, height: h, overflow: 'hidden', flexShrink: 0,
           position: 'relative', zIndex: getZIndex('photo'),
           opacity: dragIdx === i ? 0.45 : 1,
           transition: 'opacity 0.15s',
           outline: dragIdx !== null && dragIdx !== i ? '2px dashed rgba(139,55,20,0.4)' : 'none',
         }}
       >
-        <img src={src} alt="" draggable={false} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', userSelect: 'none' }} />
+        <img src={src} alt="" draggable={false} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', userSelect: 'none', filter: fi || undefined }} />
       </div>
     )
   }
@@ -305,16 +386,16 @@ export default function PrintPreview({ format, photos, filter, frameColor, frame
   let preview = null
   switch (format.layout) {
     case 'polaroid':
-      preview = <div ref={frameRef} style={{ background: bg, padding: '22px 22px 68px', boxShadow: shadow, display: 'inline-block', position: 'relative', ...clip }}>{slot(photos[0], 340, 340, 0)}{frameOverlay()}{stickerLayer()}{selectionIndicator()}</div>
+      preview = <div ref={frameRef} style={{ background: bg, padding: '22px 22px 68px', boxShadow: shadow, display: 'inline-block', position: 'relative', ...clip }}>{slot(photos[0], 340, 340, 0)}{frameOverlay()}{stickerLayer()}</div>
       break
     case 'vertical-strip':
-      preview = <div ref={frameRef} style={{ background: bg, padding: '16px 16px 50px', display: 'inline-flex', flexDirection: 'column', gap: 8, boxShadow: shadow, position: 'relative', ...clip }}>{photos.map((p, i) => slot(p, 300, 200, i))}{frameOverlay()}{stickerLayer()}{selectionIndicator()}</div>
+      preview = <div ref={frameRef} style={{ background: bg, padding: '16px 16px 50px', display: 'inline-flex', flexDirection: 'column', gap: 8, boxShadow: shadow, position: 'relative', ...clip }}>{photos.map((p, i) => slot(p, 300, 200, i))}{frameOverlay()}{stickerLayer()}</div>
       break
     case 'landscape-sequence':
-      preview = <div ref={frameRef} style={{ background: bg, padding: '16px 16px 32px', display: 'inline-flex', flexDirection: 'row', gap: 8, boxShadow: shadow, position: 'relative', ...clip }}>{photos.map((p, i) => slot(p, 210, 158, i))}{frameOverlay()}{stickerLayer()}{selectionIndicator()}</div>
+      preview = <div ref={frameRef} style={{ background: bg, padding: '16px 16px 32px', display: 'inline-flex', flexDirection: 'row', gap: 8, boxShadow: shadow, position: 'relative', ...clip }}>{photos.map((p, i) => slot(p, 210, 158, i))}{frameOverlay()}{stickerLayer()}</div>
       break
     case 'modern-grid':
-      preview = <div ref={frameRef} style={{ background: bg, padding: '16px 16px 50px', display: 'inline-grid', gridTemplateColumns: '1fr 1fr', gap: 8, boxShadow: shadow, position: 'relative', ...clip }}>{photos.map((p, i) => slot(p, 210, 158, i))}{frameOverlay()}{stickerLayer()}{selectionIndicator()}</div>
+      preview = <div ref={frameRef} style={{ background: bg, padding: '16px 16px 50px', display: 'inline-grid', gridTemplateColumns: '1fr 1fr', gap: 8, boxShadow: shadow, position: 'relative', ...clip }}>{photos.map((p, i) => slot(p, 210, 158, i))}{frameOverlay()}{stickerLayer()}</div>
       break
     case 'mixed-narrative': {
       const topW = 500, topH = Math.round(topW * 9 / 16), gap = 8
@@ -325,7 +406,6 @@ export default function PrintPreview({ format, photos, filter, frameColor, frame
           <div style={{ display: 'flex', flexDirection: 'row', gap: 8 }}>{photos.slice(1).map((p, i) => slot(p, bottomW, bottomH, i + 1))}</div>
           {frameOverlay()}
           {stickerLayer()}
-          {selectionIndicator()}
         </div>
       )
       break

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { HexColorPicker } from 'react-colorful'
 import { FILTERS, FRAME_COLORS, FRAME_STYLES } from '../data/formats'
 import PrintPreview from './PrintPreview'
@@ -45,10 +45,41 @@ export default function CustomizeStep({
   const [expandedLayerId, setExpandedLayerId] = useState(null)
   const [customPickerOpen, setCustomPickerOpen] = useState(false)
   const [customHex, setCustomHex] = useState('#8B3714')
+  const importInputRef = useRef(null)
+
+  function nextStickerName(type, currentLayers) {
+    const prefix = type === 'star' ? 'Star' : 'Import'
+    const used = currentLayers
+      .filter(l => l.label?.startsWith(prefix + ' '))
+      .map(l => parseInt(l.label.slice(prefix.length + 1), 10))
+      .filter(n => Number.isInteger(n) && n > 0)
+    let n = 1
+    while (used.includes(n)) n++
+    return `${prefix} ${n}`
+  }
 
   function addSticker(type) {
-    const label = type === 'star' ? 'Star' : type
-    onLayersChange([{ id: Date.now() + Math.random(), type, label, x: 0.5, y: 0.5, size: 1 }, ...layers])
+    const label = nextStickerName(type, layers)
+    onLayersChange([{ id: Date.now() + Math.random(), type, label, x: 0.5, y: 0.5, size: 1, rotation: 0 }, ...layers])
+  }
+
+  function handleImportFile(e) {
+    const file = e.target.files[0]
+    if (!file) return
+    e.target.value = ''
+    const reader = new FileReader()
+    reader.onload = ev => {
+      const src = ev.target.result
+      const img = new Image()
+      img.onload = () => {
+        const aspectRatio = img.width / img.height
+        const label = nextStickerName('import', layers)
+        onLayersChange(prev => [{ id: Date.now() + Math.random(), type: 'import', label, x: 0.5, y: 0.5, size: 1, rotation: 0, src, aspectRatio }, ...prev])
+      }
+      img.onerror = () => {}
+      img.src = src
+    }
+    reader.readAsDataURL(file)
   }
 
   function updateStickerSize(id, size) {
@@ -240,12 +271,22 @@ export default function CustomizeStep({
               <p className="text-[10px] text-[#b0a898] dark:text-[#5c4f4a]">Tap to add · Drag in preview to reposition</p>
               <div className="flex flex-wrap gap-2">
                 <button
+                  onClick={() => importInputRef.current?.click()}
+                  className="flex flex-col items-center justify-center gap-1 w-16 aspect-square rounded-lg border-2 border-[#e5e0d8] dark:border-[#3d2f2b] hover:border-[#8B3714] dark:hover:border-[#8B3714] transition-all"
+                >
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-[#7a6f68] dark:text-[#8c7e78]">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
+                  </svg>
+                  <span className="text-[10px] text-[#7a6f68] dark:text-[#8c7e78]">Import</span>
+                </button>
+                <button
                   onClick={() => addSticker('star')}
                   className="flex flex-col items-center justify-center gap-1 w-16 aspect-square rounded-lg border-2 border-[#e5e0d8] dark:border-[#3d2f2b] hover:border-[#8B3714] dark:hover:border-[#8B3714] transition-all"
                 >
                   <StarPreview size={28} />
                   <span className="text-[10px] text-[#7a6f68] dark:text-[#8c7e78]">Star</span>
                 </button>
+                <input ref={importInputRef} type="file" accept="image/*" className="hidden" onChange={handleImportFile} />
               </div>
             </div>
 
@@ -296,6 +337,11 @@ export default function CustomizeStep({
                         </svg>
                         <div className="shrink-0">
                           {layer.type === 'star' && <StarPreview size={18} />}
+                          {layer.type === 'import' && (
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-[#7a6f68] dark:text-[#8c7e78]">
+                              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
+                            </svg>
+                          )}
                           {layer.type === 'photo' && (
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-[#7a6f68] dark:text-[#8c7e78]">
                               <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>
