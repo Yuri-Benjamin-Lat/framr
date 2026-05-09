@@ -16,24 +16,24 @@ function getCanvasSlots(layout, w, h) {
     case 'polaroid':
       return [{ x: 38, y: 37, w: w - 76, h: h - 151 }]
     case 'vertical-strip': {
-      const pS = 26, pT = 25, pB = 78, gap = 8
+      const pS = 26, pT = 25, pB = 78, gap = 13
       const pw = w - pS * 2
       const ph = Math.round((h - pT - pB - gap * 2) / 3)
       return [0,1,2].map(i => ({ x: pS, y: pT + i*(ph+gap), w: pw, h: ph }))
     }
     case 'landscape-sequence': {
-      const pS = 29, pT = 26, pB = 53, gap = 8
+      const pS = 29, pT = 26, pB = 53, gap = 15
       const pw = Math.round((w - pS * 2 - gap * 2) / 3)
       return [0,1,2].map(i => ({ x: pS + i*(pw+gap), y: pT, w: pw, h: h - pT - pB }))
     }
     case 'modern-grid': {
-      const pS = 30, pT = 27, pB = 83, gap = 8
+      const pS = 30, pT = 27, pB = 83, gap = 15
       const pw = Math.round((w - pS * 2 - gap) / 2)
       const ph = Math.round((h - pT - pB - gap) / 2)
       return [0,1,2,3].map(i => ({ x: pS + (i%2)*(pw+gap), y: pT + Math.floor(i/2)*(ph+gap), w: pw, h: ph }))
     }
     case 'mixed-narrative': {
-      const pS = 19, pT = 19, gap = 8, innerW = w - pS * 2
+      const pS = 19, pT = 19, gap = 9, innerW = w - pS * 2
       const topH = Math.round(innerW * 9/16)
       const bottomW = Math.round((innerW - gap * 2) / 3)
       const bottomH = Math.round(bottomW * 3/4)
@@ -119,7 +119,7 @@ export async function compositePhoto({ photos, format, filter, frameColor, frame
       break
     }
     case 'vertical-strip': {
-      const pS = 26, pT = 25, pB = 78, gap = 8
+      const pS = 26, pT = 25, pB = 78, gap = 13
       canvas.width = 540; canvas.height = 1058
       const pw = canvas.width - pS * 2
       const ph = Math.round((canvas.height - pT - pB - gap * 2) / 3)
@@ -131,7 +131,7 @@ export async function compositePhoto({ photos, format, filter, frameColor, frame
       break
     }
     case 'landscape-sequence': {
-      const pS = 29, pT = 26, pB = 53, gap = 8
+      const pS = 29, pT = 26, pB = 53, gap = 15
       canvas.width = 1256; canvas.height = 340
       const pw = Math.round((canvas.width - pS * 2 - gap * 2) / 3)
       const ph = canvas.height - pT - pB
@@ -143,7 +143,7 @@ export async function compositePhoto({ photos, format, filter, frameColor, frame
       break
     }
     case 'modern-grid': {
-      const pS = 30, pT = 27, pB = 83, gap = 8
+      const pS = 30, pT = 27, pB = 83, gap = 15
       canvas.width = 848; canvas.height = 648
       const pw = Math.round((canvas.width - pS * 2 - gap) / 2)
       const ph = Math.round((canvas.height - pT - pB - gap) / 2)
@@ -156,7 +156,7 @@ export async function compositePhoto({ photos, format, filter, frameColor, frame
       break
     }
     case 'mixed-narrative': {
-      const pS = 19, pT = 19, pB = 58, gap = 8
+      const pS = 19, pT = 19, pB = 58, gap = 9
       const innerW = 582
       const topH = Math.round(innerW * 9 / 16)
       const bottomW = Math.round((innerW - gap * 2) / 3)
