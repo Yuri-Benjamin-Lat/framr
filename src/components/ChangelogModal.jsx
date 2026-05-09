@@ -6,6 +6,7 @@ const V1_RELEASES = [
     date: 'May 2025',
     majorFeatures: [
       'New Frame Style customization',
+      'Reworked Frame color customization',
     ],
     minorFeatures: [
       'Improved layouts and spacing on mobile and tablet screens',

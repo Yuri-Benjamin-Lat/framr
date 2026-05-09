@@ -1,5 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
+import { HexColorPicker } from 'react-colorful'
 import { FILTERS, FRAME_COLORS, FRAME_STYLES } from '../data/formats'
+
 
 function StyleIcon({ id, active }) {
   const stroke = active ? '#8B3714' : '#7a6f68'
@@ -179,10 +181,10 @@ function PrintPreview({ format, photos, filter, frameColor, frameStyle, onPhotos
       </div>
       {scale !== 1 && (
         <div className="absolute bottom-3 right-3 flex items-center gap-1.5 pointer-events-auto">
-          <span className="text-[10px] bg-black/30 text-white px-2 py-1 rounded-full">
+          <span className="text-[10px] bg-[#ede5db] dark:bg-[#2c2220] text-[#7a6f68] dark:text-[#8c7e78] px-2 py-1 rounded-full">
             {scale >= 1 ? Math.round(scale * 100) : Math.round((scale - 1) * 100)}%
           </span>
-          <button onPointerDown={e => e.stopPropagation()} onClick={resetZoom} className="text-[10px] bg-black/30 hover:bg-black/50 text-white px-2 py-1 rounded-full transition-colors">Reset</button>
+          <button onPointerDown={e => e.stopPropagation()} onClick={resetZoom} className="text-[10px] bg-[#ede5db] dark:bg-[#2c2220] hover:bg-[#e0d5c8] dark:hover:bg-[#352825] text-[#7a6f68] dark:text-[#8c7e78] px-2 py-1 rounded-full transition-colors">Reset</button>
         </div>
       )}
     </div>
@@ -199,6 +201,14 @@ export default function CustomizeStep({
   const [filterOpen, setFilterOpen] = useState(false)
   const [frameOpen, setFrameOpen] = useState(false)
   const [styleOpen, setStyleOpen] = useState(false)
+  const [customPickerOpen, setCustomPickerOpen] = useState(false)
+  const [customHex, setCustomHex] = useState('#8B3714')
+
+  function handleCustomHex(val) {
+    const clean = val.startsWith('#') ? val : '#' + val
+    setCustomHex(clean)
+    if (/^#[0-9a-fA-F]{6}$/.test(clean)) onFrameColorChange({ id: 'custom', label: 'Custom', value: clean })
+  }
 
   const customizeControls = (
     <div className="flex flex-col gap-3">
@@ -248,18 +258,67 @@ export default function CustomizeStep({
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={`text-[#7a6f68] dark:text-[#8c7e78] transition-transform ${frameOpen ? 'rotate-180' : ''}`}><path d="M6 9l6 6 6-6"/></svg>
         </button>
         {frameOpen && (
-          <div className="p-3 border-t border-[#e5e0d8] dark:border-[#3d2f2b] flex gap-2 flex-wrap">
-            {FRAME_COLORS.map(fc => (
+          <div className="p-3 border-t border-[#e5e0d8] dark:border-[#3d2f2b] flex flex-col gap-3">
+            <div className="flex gap-2 flex-wrap">
+              {FRAME_COLORS.map(fc => (
+                <button
+                  key={fc.id}
+                  onClick={() => { onFrameColorChange(fc); setCustomPickerOpen(false) }}
+                  title={fc.label}
+                  style={{ backgroundColor: fc.value }}
+                  className={`w-9 h-9 rounded-full border-2 transition-all ${
+                    frameColor.id === fc.id ? 'border-[#8B3714] scale-110' : 'border-[#e5e0d8] dark:border-[#3d2f2b] hover:border-[#c5bfb8]'
+                  }`}
+                />
+              ))}
               <button
-                key={fc.id}
-                onClick={() => onFrameColorChange(fc)}
-                title={fc.label}
-                style={{ backgroundColor: fc.value }}
-                className={`w-9 h-9 rounded-full border-2 transition-all ${
-                  frameColor.id === fc.id ? 'border-[#8B3714] scale-110' : 'border-[#e5e0d8] dark:border-[#3d2f2b] hover:border-[#c5bfb8]'
+                onClick={() => setCustomPickerOpen(o => !o)}
+                title="Custom color"
+                className={`w-9 h-9 rounded-full border-2 transition-all overflow-hidden ${
+                  frameColor.id === 'custom' ? 'border-[#8B3714] scale-110' : 'border-[#e5e0d8] dark:border-[#3d2f2b] hover:border-[#c5bfb8]'
                 }`}
+                style={{ background: 'conic-gradient(red, yellow, lime, cyan, blue, magenta, red)' }}
               />
-            ))}
+              {'EyeDropper' in window && (
+                <button
+                  onClick={() => {
+                    new window.EyeDropper().open().then(r => {
+                      setCustomHex(r.sRGBHex)
+                      onFrameColorChange({ id: 'eyedropper', label: 'Custom', value: r.sRGBHex })
+                    }).catch(() => {})
+                  }}
+                  title="Pick color from screen"
+                  className={`w-9 h-9 rounded-full border-2 transition-all flex items-center justify-center bg-[#faf8f5] dark:bg-[#1e1714] ${
+                    frameColor.id === 'eyedropper' ? 'border-[#8B3714] scale-110' : 'border-[#e5e0d8] dark:border-[#3d2f2b] hover:border-[#c5bfb8]'
+                  }`}
+                >
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-[#7a6f68] dark:text-[#8c7e78]">
+                    <path d="m2 22 1-1h3l9-9"/>
+                    <path d="M3 21v-3l9-9"/>
+                    <path d="m15 6 3.4-3.4a2.1 2.1 0 1 1 3 3L18 9l.4.4a2.1 2.1 0 1 1-3 3l-3.8-3.8"/>
+                  </svg>
+                </button>
+              )}
+            </div>
+            {customPickerOpen && (
+              <div className="flex flex-col gap-2.5 pt-1">
+                <HexColorPicker
+                  color={frameColor.id === 'custom' || frameColor.id === 'eyedropper' ? frameColor.value : customHex}
+                  onChange={val => { setCustomHex(val); onFrameColorChange({ id: 'custom', label: 'Custom', value: val }) }}
+                />
+                <div className="flex items-center gap-2">
+                  <span className="w-7 h-7 rounded-md border border-[#e5e0d8] dark:border-[#3d2f2b] shrink-0" style={{ backgroundColor: frameColor.id === 'custom' || frameColor.id === 'eyedropper' ? frameColor.value : customHex }} />
+                  <input
+                    type="text"
+                    value={(frameColor.id === 'custom' || frameColor.id === 'eyedropper' ? frameColor.value : customHex).toUpperCase()}
+                    onChange={e => handleCustomHex(e.target.value)}
+                    maxLength={7}
+                    spellCheck={false}
+                    className="flex-1 text-xs font-mono bg-[#f5f0ea] dark:bg-[#191210] border border-[#e5e0d8] dark:border-[#3d2f2b] rounded-lg px-2 py-1.5 text-[#1a1614] dark:text-[#ede8e0] focus:outline-none focus:border-[#8B3714] transition-colors"
+                  />
+                </div>
+              </div>
+            )}
           </div>
         )}
       </div>

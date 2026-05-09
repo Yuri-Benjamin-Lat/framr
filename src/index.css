@@ -52,6 +52,17 @@ body {
   100% { transform: scale(2.8); opacity: 0; }
 }
 
+/* react-colorful overrides */
+.react-colorful { width: 100% !important; gap: 10px; }
+.react-colorful__saturation { border-radius: 8px !important; border-bottom: none !important; }
+.react-colorful__hue { border-radius: 6px !important; height: 12px !important; }
+.react-colorful__pointer {
+  width: 18px !important;
+  height: 18px !important;
+  border: 2px solid #fff !important;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.35) !important;
+}
+
 .splash-logo      { animation: splash-logo-in 0.6s cubic-bezier(0.2,0,0.3,1) both; }
 .lens-flash-fill  { animation: lens-fill-flash 0.5s ease-out forwards; }
 .lens-glow-ring   { transform-origin: 12px 13px; animation: lens-glow-ring 0.6s ease-out forwards; }
