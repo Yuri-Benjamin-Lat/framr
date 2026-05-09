@@ -207,31 +207,29 @@ export default function CustomizeStep({
       )}
       <div className="border border-[#e5e0d8] dark:border-[#3d2f2b] rounded-xl overflow-hidden">
         <button
-          onClick={() => setFilterOpen(o => !o)}
+          onClick={() => setStyleOpen(o => !o)}
           className="w-full flex items-center px-4 py-3 bg-[#faf8f5] dark:bg-[#1e1714] hover:bg-[#f5f0ea] dark:hover:bg-[#251e1b] transition-colors"
         >
           <div className="flex items-center justify-between flex-1 mr-2">
-            <span className="text-xs font-semibold text-[#7a6f68] dark:text-[#8c7e78] uppercase tracking-wider">Filter</span>
-            <span className="text-xs text-[#8B3714] dark:text-[#c4643a]">{filter.name}</span>
+            <span className="text-xs font-semibold text-[#7a6f68] dark:text-[#8c7e78] uppercase tracking-wider">Frame Style</span>
+            <span className="text-xs text-[#8B3714] dark:text-[#c4643a]">{frameStyle.name}</span>
           </div>
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={`text-[#7a6f68] dark:text-[#8c7e78] transition-transform ${filterOpen ? 'rotate-180' : ''}`}><path d="M6 9l6 6 6-6"/></svg>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={`text-[#7a6f68] dark:text-[#8c7e78] transition-transform ${styleOpen ? 'rotate-180' : ''}`}><path d="M6 9l6 6 6-6"/></svg>
         </button>
-        {filterOpen && (
+        {styleOpen && (
           <div className="p-3 border-t border-[#e5e0d8] dark:border-[#3d2f2b] grid grid-cols-2 gap-2">
-            {FILTERS.map(f => (
+            {FRAME_STYLES.map(fs => (
               <button
-                key={f.id}
-                onClick={() => onFilterChange(f)}
-                className={`rounded-lg overflow-hidden border-2 transition-all ${
-                  filter.id === f.id
-                    ? 'border-[#8B3714]'
+                key={fs.id}
+                onClick={() => onFrameStyleChange(fs)}
+                className={`flex flex-col items-center gap-1.5 p-2 rounded-lg border-2 transition-all ${
+                  frameStyle.id === fs.id
+                    ? 'border-[#8B3714] bg-[#fdf5f0] dark:bg-[#2a1a14]'
                     : 'border-[#e5e0d8] dark:border-[#3d2f2b] hover:border-[#c5bfb8] dark:hover:border-[#5a4a46]'
                 }`}
               >
-                <div style={{ height: 52, background: '#2d3748', filter: f.css === 'none' ? undefined : f.css }} />
-                <p className={`text-xs py-1.5 text-center bg-white dark:bg-[#221a18] ${filter.id === f.id ? 'text-[#8B3714] dark:text-[#c4643a] font-medium' : 'text-[#7a6f68] dark:text-[#8c7e78]'}`}>
-                  {f.name}
-                </p>
+                <StyleIcon id={fs.id} active={frameStyle.id === fs.id} />
+                <span className={`text-xs ${frameStyle.id === fs.id ? 'text-[#8B3714] dark:text-[#c4643a] font-medium' : 'text-[#7a6f68] dark:text-[#8c7e78]'}`}>{fs.name}</span>
               </button>
             ))}
           </div>
@@ -268,29 +266,31 @@ export default function CustomizeStep({
 
       <div className="border border-[#e5e0d8] dark:border-[#3d2f2b] rounded-xl overflow-hidden">
         <button
-          onClick={() => setStyleOpen(o => !o)}
+          onClick={() => setFilterOpen(o => !o)}
           className="w-full flex items-center px-4 py-3 bg-[#faf8f5] dark:bg-[#1e1714] hover:bg-[#f5f0ea] dark:hover:bg-[#251e1b] transition-colors"
         >
           <div className="flex items-center justify-between flex-1 mr-2">
-            <span className="text-xs font-semibold text-[#7a6f68] dark:text-[#8c7e78] uppercase tracking-wider">Frame Style</span>
-            <span className="text-xs text-[#8B3714] dark:text-[#c4643a]">{frameStyle.name}</span>
+            <span className="text-xs font-semibold text-[#7a6f68] dark:text-[#8c7e78] uppercase tracking-wider">Filter</span>
+            <span className="text-xs text-[#8B3714] dark:text-[#c4643a]">{filter.name}</span>
           </div>
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={`text-[#7a6f68] dark:text-[#8c7e78] transition-transform ${styleOpen ? 'rotate-180' : ''}`}><path d="M6 9l6 6 6-6"/></svg>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={`text-[#7a6f68] dark:text-[#8c7e78] transition-transform ${filterOpen ? 'rotate-180' : ''}`}><path d="M6 9l6 6 6-6"/></svg>
         </button>
-        {styleOpen && (
+        {filterOpen && (
           <div className="p-3 border-t border-[#e5e0d8] dark:border-[#3d2f2b] grid grid-cols-2 gap-2">
-            {FRAME_STYLES.map(fs => (
+            {FILTERS.map(f => (
               <button
-                key={fs.id}
-                onClick={() => onFrameStyleChange(fs)}
-                className={`flex flex-col items-center gap-1.5 p-2 rounded-lg border-2 transition-all ${
-                  frameStyle.id === fs.id
-                    ? 'border-[#8B3714] bg-[#fdf5f0] dark:bg-[#2a1a14]'
+                key={f.id}
+                onClick={() => onFilterChange(f)}
+                className={`rounded-lg overflow-hidden border-2 transition-all ${
+                  filter.id === f.id
+                    ? 'border-[#8B3714]'
                     : 'border-[#e5e0d8] dark:border-[#3d2f2b] hover:border-[#c5bfb8] dark:hover:border-[#5a4a46]'
                 }`}
               >
-                <StyleIcon id={fs.id} active={frameStyle.id === fs.id} />
-                <span className={`text-xs ${frameStyle.id === fs.id ? 'text-[#8B3714] dark:text-[#c4643a] font-medium' : 'text-[#7a6f68] dark:text-[#8c7e78]'}`}>{fs.name}</span>
+                <div style={{ height: 52, background: '#2d3748', filter: f.css === 'none' ? undefined : f.css }} />
+                <p className={`text-xs py-1.5 text-center bg-white dark:bg-[#221a18] ${filter.id === f.id ? 'text-[#8B3714] dark:text-[#c4643a] font-medium' : 'text-[#7a6f68] dark:text-[#8c7e78]'}`}>
+                  {f.name}
+                </p>
               </button>
             ))}
           </div>

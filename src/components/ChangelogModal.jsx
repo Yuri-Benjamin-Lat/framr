@@ -2,28 +2,34 @@ import { useState } from 'react'
 
 const V1_RELEASES = [
   {
-    version: 'V1.0.1',
+    version: 'V1.1.0',
     date: 'May 2025',
-    features: [
+    majorFeatures: [
+      'New Frame Style customization',
+    ],
+    minorFeatures: [
       'Improved layouts and spacing on mobile and tablet screens',
       'Introduced this changelog, accessible from the footer',
-      'Square crop guide overlay on the camera for Polaroid Snap and Modern Grid — sides dim so you know exactly where to frame',
-      'Zoom into the preview with scroll or pinch, then freely drag it around',
+      'Square crop guide overlay for square layouts',
+      'Zoom and Drag photo for customization step',
+      'Fully responsive for all screen sizes',
     ],
   },
   {
     version: 'V1.0.0',
     date: 'April 2026',
     description: 'framr is a browser-based instant photo booth — no app to download, no account needed, and nothing ever leaves your device. Open it, pick a layout, and start shooting.',
-    features: [
-      '5 layouts: Polaroid Snap, Vertical Strip, Landscape Sequence, Modern Grid, and Mixed Narrative',
-      'Live camera capture with auto-shoot mode, countdown timer, and front/back flip',
-      'Filter presets and frame color customization',
+    majorFeatures: [
+      'Layout strip customization',
+      'Frame color customization',
+      'Filter customization',
+    ],
+    minorFeatures: [
+      'Camera with auto-shoot mode, countdown timer, and front/back flip',
+      'Download as PNG or JPEG, print, or share directly from your device',
+      'Privacy-first: everything runs in your browser, nothing is uploaded',  
       'Drag-to-reorder photos before saving',
-      'Download as PNG or JPEG, print, or share directly from your phone',
-      'Fully responsive — works on mobile, tablet, and desktop',
-      'Dark mode with a warm darkroom palette, remembered across sessions',
-      'Privacy-first: everything runs in your browser, nothing is uploaded',
+      'Theme toggle: light and dark modes',
     ],
   },
 ]
@@ -89,18 +95,33 @@ export default function ChangelogModal({ onClose }) {
 
                   {release.description && <p className="text-xs text-[#4a3f3a] dark:text-[#c8bdb8] leading-relaxed mb-4">{release.description}</p>}
 
-                  <div className="space-y-1.5">
-                    <span className="inline-block text-[9px] font-bold uppercase tracking-wide px-1.5 py-0.5 rounded bg-[#8B3714]/10 text-[#8B3714] dark:bg-[#8B3714]/20 dark:text-[#c4714a] mb-1">
-                      Features
-                    </span>
-                    <ul className="space-y-2">
-                      {release.features.map((feat, i) => (
-                        <li key={i} className="flex items-start gap-2">
-                          <span className="mt-1.5 w-1 h-1 rounded-full bg-[#8B3714]/40 dark:bg-[#c4714a]/40 shrink-0" />
-                          <span className="text-xs text-[#4a3f3a] dark:text-[#c8bdb8] leading-relaxed">{feat}</span>
-                        </li>
-                      ))}
-                    </ul>
+                  <div className="space-y-3">
+                    <div className="space-y-1.5">
+                      <span className="inline-block text-[9px] font-bold uppercase tracking-wide px-1.5 py-0.5 rounded bg-[#8B3714]/10 text-[#8B3714] dark:bg-[#8B3714]/20 dark:text-[#c4714a] mb-1">
+                        Major Features
+                      </span>
+                      <ul className="space-y-2">
+                        {release.majorFeatures.map((feat, i) => (
+                          <li key={i} className="flex items-start gap-2">
+                            <span className="mt-1.5 w-1 h-1 rounded-full bg-[#8B3714]/40 dark:bg-[#c4714a]/40 shrink-0" />
+                            <span className="text-xs text-[#4a3f3a] dark:text-[#c8bdb8] leading-relaxed">{feat}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                    <div className="space-y-1.5">
+                      <span className="inline-block text-[9px] font-bold uppercase tracking-wide px-1.5 py-0.5 rounded bg-[#7a6f68]/10 text-[#7a6f68] dark:bg-[#7a6f68]/20 dark:text-[#8c7e78] mb-1">
+                        Minor Features
+                      </span>
+                      <ul className="space-y-2">
+                        {release.minorFeatures.map((feat, i) => (
+                          <li key={i} className="flex items-start gap-2">
+                            <span className="mt-1.5 w-1 h-1 rounded-full bg-[#7a6f68]/40 dark:bg-[#8c7e78]/40 shrink-0" />
+                            <span className="text-xs text-[#4a3f3a] dark:text-[#c8bdb8] leading-relaxed">{feat}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
                   </div>
 
                   {idx < V1_RELEASES.length - 1 && (
