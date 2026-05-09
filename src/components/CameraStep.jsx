@@ -11,7 +11,16 @@ export default function CameraStep({ format, photos, onPhotosChange, onNext, onB
 
   const totalShots = format.photoCount
   const allDone = photos.length >= totalShots
-  const isSquare = format.layout === 'polaroid' || format.layout === 'modern-grid'
+  const currentShot = photos.length
+  const sideCropPct = (() => {
+    const { layout } = format
+    if (layout === 'polaroid') return 21.875
+    if (layout === 'modern-grid') return 21.875
+    if (layout === 'vertical-strip') return 5.74
+    if (layout === 'landscape-sequence') return 8.09
+    if (layout === 'mixed-narrative') return currentShot === 0 ? 0 : 12.5
+    return 0
+  })()
 
   useEffect(() => {
     start('user')
@@ -150,24 +159,24 @@ export default function CameraStep({ format, photos, onPhotosChange, onNext, onB
                 }}
               />
             )}
-            {!flashing && !isSquare && (
+            {!flashing && sideCropPct > 0 && (
               <>
-                <div className="absolute top-3 left-3 w-5 h-5 border-t-2 border-l-2 border-[#8B3714] pointer-events-none" />
-                <div className="absolute top-3 right-3 w-5 h-5 border-t-2 border-r-2 border-[#8B3714] pointer-events-none" />
-                <div className="absolute bottom-3 left-3 w-5 h-5 border-b-2 border-l-2 border-[#8B3714] pointer-events-none" />
-                <div className="absolute bottom-3 right-3 w-5 h-5 border-b-2 border-r-2 border-[#8B3714] pointer-events-none" />
-              </>
-            )}
-            {!flashing && isSquare && (
-              <>
-                <div className="absolute left-0 top-0 bottom-0 w-[21.875%] bg-black/50 pointer-events-none" />
-                <div className="absolute right-0 top-0 bottom-0 w-[21.875%] bg-black/50 pointer-events-none" />
-                <div className="absolute inset-y-3 left-[21.875%] right-[21.875%] pointer-events-none">
+                <div className="absolute left-0 top-0 bottom-0 bg-black/50 pointer-events-none" style={{ width: `${sideCropPct}%` }} />
+                <div className="absolute right-0 top-0 bottom-0 bg-black/50 pointer-events-none" style={{ width: `${sideCropPct}%` }} />
+                <div className="absolute inset-y-3 pointer-events-none" style={{ left: `${sideCropPct}%`, right: `${sideCropPct}%` }}>
                   <div className="absolute top-0 left-0 w-5 h-5 border-t-2 border-l-2 border-[#8B3714]" />
                   <div className="absolute top-0 right-0 w-5 h-5 border-t-2 border-r-2 border-[#8B3714]" />
                   <div className="absolute bottom-0 left-0 w-5 h-5 border-b-2 border-l-2 border-[#8B3714]" />
                   <div className="absolute bottom-0 right-0 w-5 h-5 border-b-2 border-r-2 border-[#8B3714]" />
                 </div>
+              </>
+            )}
+            {!flashing && sideCropPct === 0 && (
+              <>
+                <div className="absolute top-3 left-3 w-5 h-5 border-t-2 border-l-2 border-[#8B3714] pointer-events-none" />
+                <div className="absolute top-3 right-3 w-5 h-5 border-t-2 border-r-2 border-[#8B3714] pointer-events-none" />
+                <div className="absolute bottom-3 left-3 w-5 h-5 border-b-2 border-l-2 border-[#8B3714] pointer-events-none" />
+                <div className="absolute bottom-3 right-3 w-5 h-5 border-b-2 border-r-2 border-[#8B3714] pointer-events-none" />
               </>
             )}
             {flashing && <div className="absolute inset-0 bg-white" />}
