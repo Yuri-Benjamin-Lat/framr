@@ -11,39 +11,35 @@ function drawStarOnCanvas(ctx, cx, cy, outerR, innerR) {
   ctx.fill()
 }
 
-function drawStickers(ctx, stickers, w, h) {
-  const outerR = Math.round(Math.min(w, h) * 0.037)
-  const innerR = Math.round(outerR * 0.42)
-  for (const { type, x, y } of stickers) {
-    if (type === 'star') drawStarOnCanvas(ctx, x * w, y * h, outerR, innerR)
-  }
-}
-
 function getCanvasSlots(layout, w, h) {
   switch (layout) {
     case 'polaroid':
-      return [{ x: 28, y: 28, w: w - 56, h: h - 118 }]
+      return [{ x: 38, y: 37, w: w - 76, h: h - 151 }]
     case 'vertical-strip': {
-      const pad = 20, ph = 334, gap = 8
-      return [0,1,2].map(i => ({ x: pad, y: pad + i*(ph+gap), w: w - pad*2, h: ph }))
+      const pS = 26, pT = 25, pB = 78, gap = 8
+      const pw = w - pS * 2
+      const ph = Math.round((h - pT - pB - gap * 2) / 3)
+      return [0,1,2].map(i => ({ x: pS, y: pT + i*(ph+gap), w: pw, h: ph }))
     }
     case 'landscape-sequence': {
-      const pad = 20, pw = 400, gap = 8
-      return [0,1,2].map(i => ({ x: pad + i*(pw+gap), y: pad, w: pw, h: h - pad*2 }))
+      const pS = 29, pT = 26, pB = 53, gap = 8
+      const pw = Math.round((w - pS * 2 - gap * 2) / 3)
+      return [0,1,2].map(i => ({ x: pS + i*(pw+gap), y: pT, w: pw, h: h - pT - pB }))
     }
     case 'modern-grid': {
-      const pad = 20, pw = 400, ph = 300, gap = 8
-      return [0,1,2,3].map(i => ({ x: pad + (i%2)*(pw+gap), y: pad + Math.floor(i/2)*(ph+gap), w: pw, h: ph }))
+      const pS = 30, pT = 27, pB = 83, gap = 8
+      const pw = Math.round((w - pS * 2 - gap) / 2)
+      const ph = Math.round((h - pT - pB - gap) / 2)
+      return [0,1,2,3].map(i => ({ x: pS + (i%2)*(pw+gap), y: pT + Math.floor(i/2)*(ph+gap), w: pw, h: ph }))
     }
     case 'mixed-narrative': {
-      const pad = 16, gap = 8, innerW = 588
+      const pS = 19, pT = 19, gap = 8, innerW = w - pS * 2
       const topH = Math.round(innerW * 9/16)
-      const bottomW = Math.round((innerW - gap*2) / 3)
+      const bottomW = Math.round((innerW - gap * 2) / 3)
       const bottomH = Math.round(bottomW * 3/4)
-      const bottomY = pad + topH + gap
       return [
-        { x: pad, y: pad, w: innerW, h: topH },
-        ...[0,1,2].map(i => ({ x: pad + i*(bottomW+gap), y: bottomY, w: bottomW, h: bottomH }))
+        { x: pS, y: pT, w: innerW, h: topH },
+        ...[0,1,2].map(i => ({ x: pS + i*(bottomW+gap), y: pT + topH + gap, w: bottomW, h: bottomH }))
       ]
     }
     default: return []
@@ -115,62 +111,64 @@ export async function compositePhoto({ photos, format, filter, frameColor, frame
 
   switch (format.layout) {
     case 'polaroid': {
-      const pw = 600, ph = 600, padSide = 28, padTop = 28, padBottom = 90
-      canvas.width = pw + padSide * 2
-      canvas.height = ph + padTop + padBottom
+      const pS = 38, pT = 37, pB = 114
+      canvas.width = 656; canvas.height = 718
       fillFrame()
-      ctx.filter = fi; drawCover(ctx, images[0], padSide, padTop, pw, ph); ctx.filter = ''
+      ctx.filter = fi; drawCover(ctx, images[0], pS, pT, canvas.width - pS*2, canvas.height - pT - pB); ctx.filter = ''
       ctx.restore()
       break
     }
     case 'vertical-strip': {
-      const pw = 500, ph = 334, pad = 20, gap = 8
-      canvas.width = pw + pad * 2
-      canvas.height = ph * 3 + pad * 2 + gap * 2
+      const pS = 26, pT = 25, pB = 78, gap = 8
+      canvas.width = 540; canvas.height = 1058
+      const pw = canvas.width - pS * 2
+      const ph = Math.round((canvas.height - pT - pB - gap * 2) / 3)
       fillFrame()
       images.forEach((img, i) => {
-        ctx.filter = fi; drawCover(ctx, img, pad, pad + i * (ph + gap), pw, ph); ctx.filter = ''
+        ctx.filter = fi; drawCover(ctx, img, pS, pT + i * (ph + gap), pw, ph); ctx.filter = ''
       })
       ctx.restore()
       break
     }
     case 'landscape-sequence': {
-      const pw = 400, ph = 300, pad = 20, gap = 8
-      canvas.width = pw * 3 + pad * 2 + gap * 2
-      canvas.height = ph + pad * 2
+      const pS = 29, pT = 26, pB = 53, gap = 8
+      canvas.width = 1256; canvas.height = 340
+      const pw = Math.round((canvas.width - pS * 2 - gap * 2) / 3)
+      const ph = canvas.height - pT - pB
       fillFrame()
       images.forEach((img, i) => {
-        ctx.filter = fi; drawCover(ctx, img, pad + i * (pw + gap), pad, pw, ph); ctx.filter = ''
+        ctx.filter = fi; drawCover(ctx, img, pS + i * (pw + gap), pT, pw, ph); ctx.filter = ''
       })
       ctx.restore()
       break
     }
     case 'modern-grid': {
-      const pw = 400, ph = 300, pad = 20, gap = 8
-      canvas.width = pw * 2 + pad * 2 + gap
-      canvas.height = ph * 2 + pad * 2 + gap
+      const pS = 30, pT = 27, pB = 83, gap = 8
+      canvas.width = 848; canvas.height = 648
+      const pw = Math.round((canvas.width - pS * 2 - gap) / 2)
+      const ph = Math.round((canvas.height - pT - pB - gap) / 2)
       fillFrame()
       images.forEach((img, i) => {
         const col = i % 2, row = Math.floor(i / 2)
-        ctx.filter = fi; drawCover(ctx, img, pad + col * (pw + gap), pad + row * (ph + gap), pw, ph); ctx.filter = ''
+        ctx.filter = fi; drawCover(ctx, img, pS + col * (pw + gap), pT + row * (ph + gap), pw, ph); ctx.filter = ''
       })
       ctx.restore()
       break
     }
     case 'mixed-narrative': {
-      const pad = 16, gap = 8
-      const innerW = 588
+      const pS = 19, pT = 19, pB = 58, gap = 8
+      const innerW = 582
       const topH = Math.round(innerW * 9 / 16)
       const bottomW = Math.round((innerW - gap * 2) / 3)
       const bottomH = Math.round(bottomW * 3 / 4)
-      canvas.width = innerW + pad * 2
-      canvas.height = pad + topH + gap + bottomH + pad
+      canvas.width = innerW + pS * 2
+      canvas.height = pT + topH + gap + bottomH + pB
       fillFrame()
-      ctx.filter = fi; drawCover(ctx, images[0], pad, pad, innerW, topH); ctx.filter = ''
-      const bottomY = pad + topH + gap
+      ctx.filter = fi; drawCover(ctx, images[0], pS, pT, innerW, topH); ctx.filter = ''
+      const bottomY = pT + topH + gap
       for (let i = 1; i <= 3 && i < images.length; i++) {
         ctx.filter = fi
-        drawCover(ctx, images[i], pad + (i - 1) * (bottomW + gap), bottomY, bottomW, bottomH)
+        drawCover(ctx, images[i], pS + (i - 1) * (bottomW + gap), bottomY, bottomW, bottomH)
         ctx.filter = ''
       }
       ctx.restore()
