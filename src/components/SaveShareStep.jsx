@@ -4,14 +4,14 @@ import ChangelogModal from './ChangelogModal'
 
 const PRIVACY_NOTE = "framr doesn't store, upload, or see your photos. All processing happens directly in your browser — nothing is sent to any server."
 
-export default function SaveShareStep({ format, photos, filter, frameColor, frameStyle, onRestart, onBack }) {
+export default function SaveShareStep({ format, photos, filter, frameColor, frameStyle, layers = [], onRestart, onBack }) {
   const [outputUrl, setOutputUrl] = useState(null)
   const [generating, setGenerating] = useState(true)
   const [showChangelog, setShowChangelog] = useState(false)
   const [copied, setCopied] = useState(false)
 
   useEffect(() => {
-    compositePhoto({ photos, format, filter, frameColor, frameStyle }).then(url => {
+    compositePhoto({ photos, format, filter, frameColor, frameStyle, layers }).then(url => {
       setOutputUrl(url)
       setGenerating(false)
     })
@@ -75,7 +75,7 @@ function print() {
       {/* Preview */}
       <div className="flex-1 flex items-center justify-center bg-[#f5f0ea] dark:bg-[#191210] p-6 md:p-10 min-h-[40vh] md:min-h-0 md:overflow-auto">
         {outputUrl && (
-          <img src={outputUrl} alt="Your print" className="max-w-full max-h-full object-contain rounded-lg shadow-2xl" />
+          <img src={outputUrl} alt="Your print" className="max-w-full max-h-full object-contain shadow-2xl" />
         )}
       </div>
 

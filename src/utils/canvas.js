@@ -1,3 +1,68 @@
+function drawStarOnCanvas(ctx, cx, cy, outerR, innerR) {
+  ctx.beginPath()
+  for (let i = 0; i < 10; i++) {
+    const a = (i * Math.PI) / 5 - Math.PI / 2
+    const r = i % 2 === 0 ? outerR : innerR
+    const x = cx + r * Math.cos(a), y = cy + r * Math.sin(a)
+    if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y)
+  }
+  ctx.closePath()
+  ctx.fillStyle = '#FFD700'
+  ctx.fill()
+}
+
+function drawStickers(ctx, stickers, w, h) {
+  const outerR = Math.round(Math.min(w, h) * 0.037)
+  const innerR = Math.round(outerR * 0.42)
+  for (const { type, x, y } of stickers) {
+    if (type === 'star') drawStarOnCanvas(ctx, x * w, y * h, outerR, innerR)
+  }
+}
+
+function getCanvasSlots(layout, w, h) {
+  switch (layout) {
+    case 'polaroid':
+      return [{ x: 28, y: 28, w: w - 56, h: h - 118 }]
+    case 'vertical-strip': {
+      const pad = 20, ph = 334, gap = 8
+      return [0,1,2].map(i => ({ x: pad, y: pad + i*(ph+gap), w: w - pad*2, h: ph }))
+    }
+    case 'landscape-sequence': {
+      const pad = 20, pw = 400, gap = 8
+      return [0,1,2].map(i => ({ x: pad + i*(pw+gap), y: pad, w: pw, h: h - pad*2 }))
+    }
+    case 'modern-grid': {
+      const pad = 20, pw = 400, ph = 300, gap = 8
+      return [0,1,2,3].map(i => ({ x: pad + (i%2)*(pw+gap), y: pad + Math.floor(i/2)*(ph+gap), w: pw, h: ph }))
+    }
+    case 'mixed-narrative': {
+      const pad = 16, gap = 8, innerW = 588
+      const topH = Math.round(innerW * 9/16)
+      const bottomW = Math.round((innerW - gap*2) / 3)
+      const bottomH = Math.round(bottomW * 3/4)
+      const bottomY = pad + topH + gap
+      return [
+        { x: pad, y: pad, w: innerW, h: topH },
+        ...[0,1,2].map(i => ({ x: pad + i*(bottomW+gap), y: bottomY, w: bottomW, h: bottomH }))
+      ]
+    }
+    default: return []
+  }
+}
+
+function drawFrameOverlay(ctx, w, h, fc, fsId, slots) {
+  ctx.beginPath()
+  if (fsId === 'rounded') {
+    const r = Math.min(w, h) * 0.05
+    ctx.roundRect(0, 0, w, h, r)
+  } else {
+    ctx.rect(0, 0, w, h)
+  }
+  slots.forEach(s => ctx.rect(s.x, s.y, s.w, s.h))
+  ctx.fillStyle = fc
+  ctx.fill('evenodd')
+}
+
 function traceFramePath(ctx, w, h, styleId) {
   ctx.beginPath()
   if (styleId === 'rounded') {
@@ -31,7 +96,7 @@ function drawCover(ctx, img, x, y, w, h) {
   ctx.drawImage(img, sx, sy, sw, sh, x, y, w, h)
 }
 
-export async function compositePhoto({ photos, format, filter, frameColor, frameStyle }) {
+export async function compositePhoto({ photos, format, filter, frameColor, frameStyle, layers = [] }) {
   const images = await Promise.all(photos.map(loadImage))
   const canvas = document.createElement('canvas')
   const ctx = canvas.getContext('2d')
@@ -112,6 +177,20 @@ export async function compositePhoto({ photos, format, filter, frameColor, frame
       break
     }
   }
+
+  const slots = getCanvasSlots(format.layout, canvas.width, canvas.height)
+  const PREVIEW_FRAME_W = { polaroid: 384, 'vertical-strip': 332, 'landscape-sequence': 678, 'modern-grid': 460, 'mixed-narrative': 532 }
+  const baseDiameter = (48 / (PREVIEW_FRAME_W[format.layout] ?? 400)) * canvas.width * 0.9
+  const outerR = Math.round(baseDiameter * 0.45)
+  const innerR = Math.round(baseDiameter * 0.19)
+  ;[...layers].reverse().forEach(layer => {
+    if (layer.type === 'photo') return
+    if (layer.type === 'frame') drawFrameOverlay(ctx, canvas.width, canvas.height, fc, fsId, slots)
+    else if (layer.type === 'star') {
+      const m = layer.size ?? 1
+      drawStarOnCanvas(ctx, layer.x * canvas.width, layer.y * canvas.height, outerR * m, innerR * m)
+    }
+  })
 
   if (fsId === 'rounded') {
     ctx.globalCompositeOperation = 'destination-in'

@@ -15,6 +15,10 @@ export default function App() {
   const [filter, setFilter] = useState(FILTERS[0])
   const [frameColor, setFrameColor] = useState(FRAME_COLORS[0])
   const [frameStyle, setFrameStyle] = useState(FRAME_STYLES[0])
+  const [layers, setLayers] = useState([
+    { id: 'photo', type: 'photo', label: 'Photo' },
+    { id: 'frame', type: 'frame', label: 'Frame' },
+  ])
   const [isDark, setIsDark] = useState(() => localStorage.getItem('theme') === 'dark')
 
   useEffect(() => {
@@ -44,6 +48,7 @@ export default function App() {
     setFilter(FILTERS[0])
     setFrameColor(FRAME_COLORS[0])
     setFrameStyle(FRAME_STYLES[0])
+    setLayers([{ id: 'photo', type: 'photo', label: 'Photo' }, { id: 'frame', type: 'frame', label: 'Frame' }])
     setFormat(FORMATS[0])
   }
 
@@ -78,6 +83,8 @@ export default function App() {
             onFrameColorChange={setFrameColor}
             onFrameStyleChange={setFrameStyle}
             onPhotosChange={setPhotos}
+            layers={layers}
+            onLayersChange={setLayers}
             onNext={goNext}
             onBack={goBackFromCustomize}
           />
@@ -89,6 +96,7 @@ export default function App() {
             filter={filter}
             frameColor={frameColor}
             frameStyle={frameStyle}
+            layers={layers}
             onRestart={restart}
             onBack={goBack}
           />

@@ -3,6 +3,21 @@ import { HexColorPicker } from 'react-colorful'
 import { FILTERS, FRAME_COLORS, FRAME_STYLES } from '../data/formats'
 import PrintPreview from './PrintPreview'
 
+function StarPreview({ size = 28 }) {
+  const cx = size / 2, cy = size / 2
+  const outer = size * 0.45, inner = size * 0.19
+  const pts = Array.from({ length: 10 }, (_, i) => {
+    const a = (i * Math.PI) / 5 - Math.PI / 2
+    const r = i % 2 === 0 ? outer : inner
+    return `${cx + r * Math.cos(a)},${cy + r * Math.sin(a)}`
+  }).join(' ')
+  return (
+    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+      <polygon points={pts} fill="#FFD700" />
+    </svg>
+  )
+}
+
 function StyleIcon({ id, active }) {
   const stroke = active ? '#8B3714' : '#7a6f68'
   const w = 44, h = 34, r = 6
@@ -15,8 +30,8 @@ function StyleIcon({ id, active }) {
 
 
 export default function CustomizeStep({
-  format, photos, filter, frameColor, frameStyle,
-  onFilterChange, onFrameColorChange, onFrameStyleChange, onPhotosChange,
+  format, photos, filter, frameColor, frameStyle, layers,
+  onFilterChange, onFrameColorChange, onFrameStyleChange, onPhotosChange, onLayersChange,
   onNext, onBack,
 }) {
   const [showBackModal, setShowBackModal] = useState(false)
@@ -24,8 +39,32 @@ export default function CustomizeStep({
   const [filterOpen, setFilterOpen] = useState(false)
   const [frameOpen, setFrameOpen] = useState(false)
   const [styleOpen, setStyleOpen] = useState(false)
+  const [stickerOpen, setStickerOpen] = useState(false)
+  const [dragLayerIdx, setDragLayerIdx] = useState(null)
+  const [selectedLayerId, setSelectedLayerId] = useState(null)
+  const [expandedLayerId, setExpandedLayerId] = useState(null)
   const [customPickerOpen, setCustomPickerOpen] = useState(false)
   const [customHex, setCustomHex] = useState('#8B3714')
+
+  function addSticker(type) {
+    const label = type === 'star' ? 'Star' : type
+    onLayersChange([{ id: Date.now() + Math.random(), type, label, x: 0.5, y: 0.5, size: 1 }, ...layers])
+  }
+
+  function updateStickerSize(id, size) {
+    onLayersChange(layers.map(l => l.id === id ? { ...l, size } : l))
+  }
+
+  function reorderLayer(from, to) {
+    const next = [...layers]
+    const [moved] = next.splice(from, 1)
+    next.splice(to, 0, moved)
+    onLayersChange(next)
+  }
+
+  function removeLayer(id) {
+    onLayersChange(layers.filter(l => l.id !== id))
+  }
 
   function handleCustomHex(val) {
     const clean = val.startsWith('#') ? val : '#' + val
@@ -178,6 +217,123 @@ export default function CustomizeStep({
           </div>
         )}
       </div>
+
+      <div className="border border-[#e5e0d8] dark:border-[#3d2f2b] rounded-xl overflow-hidden">
+        <button
+          onClick={() => setStickerOpen(o => !o)}
+          className="w-full flex items-center px-4 py-3 bg-[#faf8f5] dark:bg-[#1e1714] hover:bg-[#f5f0ea] dark:hover:bg-[#251e1b] transition-colors"
+        >
+          <div className="flex items-center justify-between flex-1 mr-2">
+            <span className="text-xs font-semibold text-[#7a6f68] dark:text-[#8c7e78] uppercase tracking-wider">Stickers</span>
+            <span className="text-xs text-[#8B3714] dark:text-[#c4643a]">
+              {layers.filter(l => l.type !== 'photo' && l.type !== 'frame').length > 0
+                ? `${layers.filter(l => l.type !== 'photo' && l.type !== 'frame').length} placed`
+                : 'None'}
+            </span>
+          </div>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={`text-[#7a6f68] dark:text-[#8c7e78] transition-transform ${stickerOpen ? 'rotate-180' : ''}`}><path d="M6 9l6 6 6-6"/></svg>
+        </button>
+        {stickerOpen && (
+          <div className="border-t border-[#e5e0d8] dark:border-[#3d2f2b] flex flex-col">
+            {/* Sticker picker */}
+            <div className="p-3 flex flex-col gap-2">
+              <p className="text-[10px] text-[#b0a898] dark:text-[#5c4f4a]">Tap to add · Drag in preview to reposition</p>
+              <div className="flex flex-wrap gap-2">
+                <button
+                  onClick={() => addSticker('star')}
+                  className="flex flex-col items-center justify-center gap-1 w-16 aspect-square rounded-lg border-2 border-[#e5e0d8] dark:border-[#3d2f2b] hover:border-[#8B3714] dark:hover:border-[#8B3714] transition-all"
+                >
+                  <StarPreview size={28} />
+                  <span className="text-[10px] text-[#7a6f68] dark:text-[#8c7e78]">Star</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Layer panel */}
+            <div className="border-t border-[#e5e0d8] dark:border-[#3d2f2b] p-3 flex flex-col gap-1.5">
+              <p className="text-[10px] font-semibold text-[#7a6f68] dark:text-[#8c7e78] uppercase tracking-wider mb-1">Layers</p>
+              <div className="flex flex-col gap-1 max-h-48 overflow-y-auto [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-[#d5cfc8] dark:[&::-webkit-scrollbar-thumb]:bg-[#3d2f2b] [&::-webkit-scrollbar-thumb]:rounded-full">
+                {layers.map((layer, i) => {
+                  const isSticker = layer.type !== 'photo' && layer.type !== 'frame'
+                  const isExpanded = isSticker && expandedLayerId === layer.id
+                  return (
+                    <div key={layer.id} className="flex flex-col">
+                      <div
+                        draggable
+                        onDragStart={() => setDragLayerIdx(i)}
+                        onDragOver={e => e.preventDefault()}
+                        onDrop={() => { if (dragLayerIdx !== null && dragLayerIdx !== i) reorderLayer(dragLayerIdx, i); setDragLayerIdx(null) }}
+                        onDragEnd={() => setDragLayerIdx(null)}
+                        onClick={() => isSticker ? setSelectedLayerId(layer.id) : setSelectedLayerId(null)}
+                        className={`flex items-center gap-2 px-2 py-1.5 border transition-all cursor-pointer ${isExpanded ? 'rounded-t-lg' : 'rounded-lg'} ${
+                          dragLayerIdx === i
+                            ? 'opacity-40 border-[#e5e0d8] dark:border-[#3d2f2b]'
+                            : isSticker && selectedLayerId === layer.id
+                              ? 'border-[#8B3714] bg-[#fdf5f0] dark:bg-[#2a1a14]'
+                              : 'border-[#e5e0d8] dark:border-[#3d2f2b] bg-[#faf8f5] dark:bg-[#1e1714] hover:border-[#c5bfb8] dark:hover:border-[#5a4a46]'
+                        }`}
+                      >
+                        <svg width="10" height="14" viewBox="0 0 10 14" className="shrink-0 cursor-grab text-[#c5bfb8] dark:text-[#5a4a46]">
+                          <circle cx="2.5" cy="2" r="1.3" fill="currentColor"/>
+                          <circle cx="7.5" cy="2" r="1.3" fill="currentColor"/>
+                          <circle cx="2.5" cy="7" r="1.3" fill="currentColor"/>
+                          <circle cx="7.5" cy="7" r="1.3" fill="currentColor"/>
+                          <circle cx="2.5" cy="12" r="1.3" fill="currentColor"/>
+                          <circle cx="7.5" cy="12" r="1.3" fill="currentColor"/>
+                        </svg>
+                        <div className="shrink-0">
+                          {layer.type === 'star' && <StarPreview size={18} />}
+                          {layer.type === 'photo' && (
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-[#7a6f68] dark:text-[#8c7e78]">
+                              <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>
+                            </svg>
+                          )}
+                          {layer.type === 'frame' && (
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-[#7a6f68] dark:text-[#8c7e78]">
+                              <rect x="3" y="3" width="18" height="18" rx="1"/><rect x="7" y="7" width="10" height="10" rx="1"/>
+                            </svg>
+                          )}
+                        </div>
+                        <span className="flex-1 text-xs text-[#1a1614] dark:text-[#ede8e0] truncate">{layer.label}</span>
+                        {isSticker && (
+                          <button
+                            onClick={e => { e.stopPropagation(); setExpandedLayerId(v => v === layer.id ? null : layer.id) }}
+                            className="shrink-0 w-5 h-5 flex items-center justify-center rounded text-[#b0a898] dark:text-[#5c4f4a] hover:text-[#7a6f68] dark:hover:text-[#8c7e78] transition-colors"
+                          >
+                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={`transition-transform ${isExpanded ? 'rotate-180' : ''}`}><path d="M6 9l6 6 6-6"/></svg>
+                          </button>
+                        )}
+                        {isSticker && (
+                          <button
+                            onClick={e => { e.stopPropagation(); removeLayer(layer.id) }}
+                            className="shrink-0 w-5 h-5 flex items-center justify-center rounded text-[#b0a898] dark:text-[#5c4f4a] hover:text-[#c0392b] dark:hover:text-[#e06050] hover:bg-[#f5e8e6] dark:hover:bg-[#3a1f1f] transition-colors"
+                          >
+                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+                          </button>
+                        )}
+                      </div>
+                      {isExpanded && (
+                        <div className="px-3 py-2 border-l border-r border-b border-[#e5e0d8] dark:border-[#3d2f2b] rounded-b-lg bg-[#faf8f5] dark:bg-[#1e1714] flex items-center gap-2">
+                          <span className="text-[10px] text-[#7a6f68] dark:text-[#8c7e78] shrink-0">Size</span>
+                          <input
+                            type="range"
+                            min="0.5"
+                            max="3"
+                            step="0.05"
+                            value={layer.size ?? 1}
+                            onChange={e => updateStickerSize(layer.id, parseFloat(e.target.value))}
+                            className="flex-1 accent-[#8B3714]"
+                          />
+                        </div>
+                      )}
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   )
 
@@ -197,7 +353,7 @@ export default function CustomizeStep({
           </button>
         </div>
 
-        <PrintPreview format={format} photos={photos} filter={filter} frameColor={frameColor} frameStyle={frameStyle} onPhotosChange={onPhotosChange} />
+        <PrintPreview format={format} photos={photos} filter={filter} frameColor={frameColor} frameStyle={frameStyle} onPhotosChange={onPhotosChange} layers={layers} onLayersChange={onLayersChange} selectedLayerId={selectedLayerId} onSelectLayer={setSelectedLayerId} />
 
         <div className="shrink-0 bg-white dark:bg-[#221a18] border-t border-[#e5e0d8] dark:border-[#3d2f2b] px-4 py-3">
           <button
@@ -212,7 +368,7 @@ export default function CustomizeStep({
 
       {/* ── Desktop/tablet layout ── */}
       <div className="hidden md:flex h-full w-full">
-        <PrintPreview format={format} photos={photos} filter={filter} frameColor={frameColor} frameStyle={frameStyle} onPhotosChange={onPhotosChange} />
+        <PrintPreview format={format} photos={photos} filter={filter} frameColor={frameColor} frameStyle={frameStyle} onPhotosChange={onPhotosChange} layers={layers} onLayersChange={onLayersChange} selectedLayerId={selectedLayerId} onSelectLayer={setSelectedLayerId} />
 
         <div className="w-72 shrink-0 border-l border-[#e5e0d8] dark:border-[#3d2f2b] bg-white dark:bg-[#221a18] flex flex-col overflow-hidden">
           <div className="h-16 px-5 border-b border-[#e5e0d8] dark:border-[#3d2f2b] flex items-center shrink-0">
