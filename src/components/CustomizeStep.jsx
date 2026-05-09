@@ -1,7 +1,22 @@
 import { useState, useRef, useEffect } from 'react'
-import { FILTERS, FRAME_COLORS } from '../data/formats'
+import { FILTERS, FRAME_COLORS, FRAME_STYLES } from '../data/formats'
 
-function PrintPreview({ format, photos, filter, frameColor, onPhotosChange }) {
+function StyleIcon({ id, active }) {
+  const stroke = active ? '#8B3714' : '#7a6f68'
+  const w = 44, h = 34, r = 6
+  if (id === 'square')
+    return <svg width={w} height={h} viewBox={`0 0 ${w} ${h}`}><rect x="2" y="2" width={w-4} height={h-4} fill="none" stroke={stroke} strokeWidth="2"/></svg>
+  if (id === 'rounded')
+    return <svg width={w} height={h} viewBox={`0 0 ${w} ${h}`}><rect x="2" y="2" width={w-4} height={h-4} rx={r} ry={r} fill="none" stroke={stroke} strokeWidth="2"/></svg>
+  return null
+}
+
+function frameClipStyle(styleId) {
+  if (styleId === 'rounded') return { borderRadius: '5%' }
+  return {}
+}
+
+function PrintPreview({ format, photos, filter, frameColor, frameStyle, onPhotosChange }) {
   const [dragIdx, setDragIdx] = useState(null)
   const [scale, setScale] = useState(1)
   const [offset, setOffset] = useState({ x: 0, y: 0 })
@@ -118,25 +133,26 @@ function PrintPreview({ format, photos, filter, frameColor, onPhotosChange }) {
     )
   }
 
+  const clip = frameClipStyle(frameStyle.id)
   let preview = null
   switch (format.layout) {
     case 'polaroid':
-      preview = <div style={{ background: bg, padding: '22px 22px 68px', boxShadow: shadow, display: 'inline-block' }}>{slot(photos[0], 340, 340, 0)}</div>
+      preview = <div style={{ background: bg, padding: '22px 22px 68px', boxShadow: shadow, display: 'inline-block', ...clip }}>{slot(photos[0], 340, 340, 0)}</div>
       break
     case 'vertical-strip':
-      preview = <div style={{ background: bg, padding: '16px 16px 50px', display: 'inline-flex', flexDirection: 'column', gap: 8, boxShadow: shadow }}>{photos.map((p, i) => slot(p, 300, 200, i))}</div>
+      preview = <div style={{ background: bg, padding: '16px 16px 50px', display: 'inline-flex', flexDirection: 'column', gap: 8, boxShadow: shadow, ...clip }}>{photos.map((p, i) => slot(p, 300, 200, i))}</div>
       break
     case 'landscape-sequence':
-      preview = <div style={{ background: bg, padding: '16px 16px 32px', display: 'inline-flex', flexDirection: 'row', gap: 8, boxShadow: shadow }}>{photos.map((p, i) => slot(p, 210, 158, i))}</div>
+      preview = <div style={{ background: bg, padding: '16px 16px 32px', display: 'inline-flex', flexDirection: 'row', gap: 8, boxShadow: shadow, ...clip }}>{photos.map((p, i) => slot(p, 210, 158, i))}</div>
       break
     case 'modern-grid':
-      preview = <div style={{ background: bg, padding: '16px 16px 50px', display: 'inline-grid', gridTemplateColumns: '1fr 1fr', gap: 8, boxShadow: shadow }}>{photos.map((p, i) => slot(p, 210, 158, i))}</div>
+      preview = <div style={{ background: bg, padding: '16px 16px 50px', display: 'inline-grid', gridTemplateColumns: '1fr 1fr', gap: 8, boxShadow: shadow, ...clip }}>{photos.map((p, i) => slot(p, 210, 158, i))}</div>
       break
     case 'mixed-narrative': {
       const topW = 500, topH = Math.round(topW * 9 / 16), gap = 8
       const bottomW = Math.round((topW - gap * 2) / 3), bottomH = Math.round(bottomW * 3 / 4)
       preview = (
-        <div style={{ background: bg, padding: '16px 16px 50px', display: 'inline-flex', flexDirection: 'column', gap: 8, boxShadow: shadow }}>
+        <div style={{ background: bg, padding: '16px 16px 50px', display: 'inline-flex', flexDirection: 'column', gap: 8, boxShadow: shadow, ...clip }}>
           {slot(photos[0], topW, topH, 0)}
           <div style={{ display: 'flex', flexDirection: 'row', gap: 8 }}>{photos.slice(1).map((p, i) => slot(p, bottomW, bottomH, i + 1))}</div>
         </div>
@@ -174,14 +190,15 @@ function PrintPreview({ format, photos, filter, frameColor, onPhotosChange }) {
 }
 
 export default function CustomizeStep({
-  format, photos, filter, frameColor,
-  onFilterChange, onFrameColorChange, onPhotosChange,
+  format, photos, filter, frameColor, frameStyle,
+  onFilterChange, onFrameColorChange, onFrameStyleChange, onPhotosChange,
   onNext, onBack,
 }) {
   const [showBackModal, setShowBackModal] = useState(false)
   const [sheetOpen, setSheetOpen] = useState(false)
-  const [filterOpen, setFilterOpen] = useState(true)
-  const [frameOpen, setFrameOpen] = useState(true)
+  const [filterOpen, setFilterOpen] = useState(false)
+  const [frameOpen, setFrameOpen] = useState(false)
+  const [styleOpen, setStyleOpen] = useState(false)
 
   const customizeControls = (
     <div className="flex flex-col gap-3">
@@ -191,9 +208,9 @@ export default function CustomizeStep({
       <div className="border border-[#e5e0d8] dark:border-[#3d2f2b] rounded-xl overflow-hidden">
         <button
           onClick={() => setFilterOpen(o => !o)}
-          className="w-full flex items-center justify-between px-4 py-3 bg-[#faf8f5] dark:bg-[#1e1714] hover:bg-[#f5f0ea] dark:hover:bg-[#251e1b] transition-colors"
+          className="w-full flex items-center px-4 py-3 bg-[#faf8f5] dark:bg-[#1e1714] hover:bg-[#f5f0ea] dark:hover:bg-[#251e1b] transition-colors"
         >
-          <div className="flex items-center gap-2">
+          <div className="flex items-center justify-between flex-1 mr-2">
             <span className="text-xs font-semibold text-[#7a6f68] dark:text-[#8c7e78] uppercase tracking-wider">Filter</span>
             <span className="text-xs text-[#8B3714] dark:text-[#c4643a]">{filter.name}</span>
           </div>
@@ -224,9 +241,9 @@ export default function CustomizeStep({
       <div className="border border-[#e5e0d8] dark:border-[#3d2f2b] rounded-xl overflow-hidden">
         <button
           onClick={() => setFrameOpen(o => !o)}
-          className="w-full flex items-center justify-between px-4 py-3 bg-[#faf8f5] dark:bg-[#1e1714] hover:bg-[#f5f0ea] dark:hover:bg-[#251e1b] transition-colors"
+          className="w-full flex items-center px-4 py-3 bg-[#faf8f5] dark:bg-[#1e1714] hover:bg-[#f5f0ea] dark:hover:bg-[#251e1b] transition-colors"
         >
-          <div className="flex items-center gap-2">
+          <div className="flex items-center justify-between flex-1 mr-2">
             <span className="text-xs font-semibold text-[#7a6f68] dark:text-[#8c7e78] uppercase tracking-wider">Frame Color</span>
             <span className="w-3 h-3 rounded-full border border-black/10 inline-block" style={{ backgroundColor: frameColor.value }} />
           </div>
@@ -244,6 +261,37 @@ export default function CustomizeStep({
                   frameColor.id === fc.id ? 'border-[#8B3714] scale-110' : 'border-[#e5e0d8] dark:border-[#3d2f2b] hover:border-[#c5bfb8]'
                 }`}
               />
+            ))}
+          </div>
+        )}
+      </div>
+
+      <div className="border border-[#e5e0d8] dark:border-[#3d2f2b] rounded-xl overflow-hidden">
+        <button
+          onClick={() => setStyleOpen(o => !o)}
+          className="w-full flex items-center px-4 py-3 bg-[#faf8f5] dark:bg-[#1e1714] hover:bg-[#f5f0ea] dark:hover:bg-[#251e1b] transition-colors"
+        >
+          <div className="flex items-center justify-between flex-1 mr-2">
+            <span className="text-xs font-semibold text-[#7a6f68] dark:text-[#8c7e78] uppercase tracking-wider">Frame Style</span>
+            <span className="text-xs text-[#8B3714] dark:text-[#c4643a]">{frameStyle.name}</span>
+          </div>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={`text-[#7a6f68] dark:text-[#8c7e78] transition-transform ${styleOpen ? 'rotate-180' : ''}`}><path d="M6 9l6 6 6-6"/></svg>
+        </button>
+        {styleOpen && (
+          <div className="p-3 border-t border-[#e5e0d8] dark:border-[#3d2f2b] grid grid-cols-2 gap-2">
+            {FRAME_STYLES.map(fs => (
+              <button
+                key={fs.id}
+                onClick={() => onFrameStyleChange(fs)}
+                className={`flex flex-col items-center gap-1.5 p-2 rounded-lg border-2 transition-all ${
+                  frameStyle.id === fs.id
+                    ? 'border-[#8B3714] bg-[#fdf5f0] dark:bg-[#2a1a14]'
+                    : 'border-[#e5e0d8] dark:border-[#3d2f2b] hover:border-[#c5bfb8] dark:hover:border-[#5a4a46]'
+                }`}
+              >
+                <StyleIcon id={fs.id} active={frameStyle.id === fs.id} />
+                <span className={`text-xs ${frameStyle.id === fs.id ? 'text-[#8B3714] dark:text-[#c4643a] font-medium' : 'text-[#7a6f68] dark:text-[#8c7e78]'}`}>{fs.name}</span>
+              </button>
             ))}
           </div>
         )}
@@ -267,7 +315,7 @@ export default function CustomizeStep({
           </button>
         </div>
 
-        <PrintPreview format={format} photos={photos} filter={filter} frameColor={frameColor} onPhotosChange={onPhotosChange} />
+        <PrintPreview format={format} photos={photos} filter={filter} frameColor={frameColor} frameStyle={frameStyle} onPhotosChange={onPhotosChange} />
 
         <div className="shrink-0 bg-white dark:bg-[#221a18] border-t border-[#e5e0d8] dark:border-[#3d2f2b] px-4 py-3">
           <button
@@ -275,14 +323,14 @@ export default function CustomizeStep({
             className="w-full flex items-center justify-center gap-2 py-3 rounded-xl border-2 border-[#e5e0d8] dark:border-[#3d2f2b] text-[#1a1614] dark:text-[#ede8e0] font-medium text-sm hover:border-[#8B3714] hover:text-[#8B3714] dark:hover:border-[#8B3714] dark:hover:text-[#c4643a] transition-colors"
           >
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20V4M5 11l7-7 7 7"/></svg>
-            Filters &amp; Frame Color
+            Filters &amp; Frame
           </button>
         </div>
       </div>
 
       {/* ── Desktop/tablet layout ── */}
       <div className="hidden md:flex h-full w-full">
-        <PrintPreview format={format} photos={photos} filter={filter} frameColor={frameColor} onPhotosChange={onPhotosChange} />
+        <PrintPreview format={format} photos={photos} filter={filter} frameColor={frameColor} frameStyle={frameStyle} onPhotosChange={onPhotosChange} />
 
         <div className="w-72 shrink-0 border-l border-[#e5e0d8] dark:border-[#3d2f2b] bg-white dark:bg-[#221a18] flex flex-col overflow-hidden">
           <div className="h-16 px-5 border-b border-[#e5e0d8] dark:border-[#3d2f2b] flex items-center shrink-0">
@@ -291,7 +339,7 @@ export default function CustomizeStep({
               <p className="text-xs text-[#7a6f68] dark:text-[#8c7e78] mt-0.5">{format.name}</p>
             </div>
           </div>
-          <div className="flex-1 overflow-y-auto p-2.5 [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-[#d5cfc8] dark:[&::-webkit-scrollbar-thumb]:bg-[#3d2f2b] [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:hover:bg-[#8B3714] dark:[&::-webkit-scrollbar-thumb]:hover:bg-[#8B3714]">{customizeControls}</div>
+          <div className="flex-1 overflow-y-auto px-2.5 pb-2.5 pt-5 [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-[#d5cfc8] dark:[&::-webkit-scrollbar-thumb]:bg-[#3d2f2b] [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:hover:bg-[#8B3714] dark:[&::-webkit-scrollbar-thumb]:hover:bg-[#8B3714]">{customizeControls}</div>
           <div className="p-5 border-t border-[#e5e0d8] dark:border-[#3d2f2b] shrink-0 flex flex-col gap-2">
             <button onClick={onNext} className="w-full bg-[#8B3714] text-white py-2.5 rounded-lg font-medium hover:bg-[#732e10] transition-colors">
               Continue →
@@ -317,7 +365,7 @@ export default function CustomizeStep({
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
               </button>
             </div>
-            <div className="flex-1 overflow-y-auto p-2.5 [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-[#d5cfc8] dark:[&::-webkit-scrollbar-thumb]:bg-[#3d2f2b] [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:hover:bg-[#8B3714] dark:[&::-webkit-scrollbar-thumb]:hover:bg-[#8B3714]">{customizeControls}</div>
+            <div className="flex-1 overflow-y-auto px-2.5 pb-2.5 pt-5 [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-[#d5cfc8] dark:[&::-webkit-scrollbar-thumb]:bg-[#3d2f2b] [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:hover:bg-[#8B3714] dark:[&::-webkit-scrollbar-thumb]:hover:bg-[#8B3714]">{customizeControls}</div>
             <div className="p-4 border-t border-[#e5e0d8] dark:border-[#3d2f2b] flex gap-3">
               <button onClick={() => { setSheetOpen(false); setShowBackModal(true) }} className="flex-1 border border-[#e5e0d8] dark:border-[#3d2f2b] text-[#1a1614] dark:text-[#ede8e0] py-2.5 rounded-lg font-medium text-sm hover:bg-[#f5f0ea] dark:hover:bg-[#2c2220] transition-colors">
                 ← Camera

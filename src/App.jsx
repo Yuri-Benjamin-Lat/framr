@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { FORMATS, FILTERS, FRAME_COLORS } from './data/formats'
+import { FORMATS, FILTERS, FRAME_COLORS, FRAME_STYLES } from './data/formats'
 import Sidebar from './components/Sidebar'
 import ChooseFormat from './components/ChooseFormat'
 import CameraStep from './components/CameraStep'
@@ -14,6 +14,7 @@ export default function App() {
   const [photos, setPhotos] = useState([])
   const [filter, setFilter] = useState(FILTERS[0])
   const [frameColor, setFrameColor] = useState(FRAME_COLORS[0])
+  const [frameStyle, setFrameStyle] = useState(FRAME_STYLES[0])
   const [isDark, setIsDark] = useState(() => localStorage.getItem('theme') === 'dark')
 
   useEffect(() => {
@@ -42,6 +43,7 @@ export default function App() {
     setPhotos([])
     setFilter(FILTERS[0])
     setFrameColor(FRAME_COLORS[0])
+    setFrameStyle(FRAME_STYLES[0])
     setFormat(FORMATS[0])
   }
 
@@ -71,8 +73,10 @@ export default function App() {
             photos={photos}
             filter={filter}
             frameColor={frameColor}
+            frameStyle={frameStyle}
             onFilterChange={setFilter}
             onFrameColorChange={setFrameColor}
+            onFrameStyleChange={setFrameStyle}
             onPhotosChange={setPhotos}
             onNext={goNext}
             onBack={goBackFromCustomize}
@@ -84,6 +88,7 @@ export default function App() {
             photos={photos}
             filter={filter}
             frameColor={frameColor}
+            frameStyle={frameStyle}
             onRestart={restart}
             onBack={goBack}
           />

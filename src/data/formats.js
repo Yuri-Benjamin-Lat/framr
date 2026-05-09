@@ -47,6 +47,11 @@ export const FILTERS = [
   { id: 'vivid', name: 'Vivid', css: 'saturate(2) contrast(1.15)' },
 ]
 
+export const FRAME_STYLES = [
+  { id: 'square',  name: 'Square' },
+  { id: 'rounded', name: 'Rounded' },
+]
+
 export const FRAME_COLORS = [
   { id: 'white', label: 'White', value: '#ffffff' },
   { id: 'black', label: 'Black', value: '#1a1a1a' },

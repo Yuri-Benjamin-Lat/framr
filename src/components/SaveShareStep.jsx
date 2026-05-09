@@ -4,13 +4,13 @@ import ChangelogModal from './ChangelogModal'
 
 const PRIVACY_NOTE = "framr doesn't store, upload, or see your photos. All processing happens directly in your browser — nothing is sent to any server."
 
-export default function SaveShareStep({ format, photos, filter, frameColor, onRestart, onBack }) {
+export default function SaveShareStep({ format, photos, filter, frameColor, frameStyle, onRestart, onBack }) {
   const [outputUrl, setOutputUrl] = useState(null)
   const [generating, setGenerating] = useState(true)
   const [showChangelog, setShowChangelog] = useState(false)
 
   useEffect(() => {
-    compositePhoto({ photos, format, filter, frameColor }).then(url => {
+    compositePhoto({ photos, format, filter, frameColor, frameStyle }).then(url => {
       setOutputUrl(url)
       setGenerating(false)
     })
