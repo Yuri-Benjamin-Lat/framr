@@ -36,10 +36,7 @@ export default function CustomizeStep({
 }) {
   const [showBackModal, setShowBackModal] = useState(false)
   const [sheetOpen, setSheetOpen] = useState(false)
-  const [filterOpen, setFilterOpen] = useState(false)
-  const [frameOpen, setFrameOpen] = useState(false)
-  const [styleOpen, setStyleOpen] = useState(false)
-  const [stickerOpen, setStickerOpen] = useState(false)
+  const [openSection, setOpenSection] = useState(null)
   const [dragLayerIdx, setDragLayerIdx] = useState(null)
   const [selectedLayerId, setSelectedLayerId] = useState(null)
   const [expandedLayerId, setExpandedLayerId] = useState(null)
@@ -110,16 +107,16 @@ export default function CustomizeStep({
       )}
       <div className="border border-[#e5e0d8] dark:border-[#3d2f2b] rounded-xl overflow-hidden">
         <button
-          onClick={() => setStyleOpen(o => !o)}
+          onClick={() => setOpenSection(s => s === 'style' ? null : 'style')}
           className="w-full flex items-center px-4 py-3 bg-[#faf8f5] dark:bg-[#1e1714] hover:bg-[#f5f0ea] dark:hover:bg-[#251e1b] transition-colors"
         >
           <div className="flex items-center justify-between flex-1 mr-2">
             <span className="text-xs font-semibold text-[#7a6f68] dark:text-[#8c7e78] uppercase tracking-wider">Frame Style</span>
             <span className="text-xs text-[#8B3714] dark:text-[#c4643a]">{frameStyle.name}</span>
           </div>
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={`text-[#7a6f68] dark:text-[#8c7e78] transition-transform ${styleOpen ? 'rotate-180' : ''}`}><path d="M6 9l6 6 6-6"/></svg>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={`text-[#7a6f68] dark:text-[#8c7e78] transition-transform ${openSection === 'style' ? 'rotate-180' : ''}`}><path d="M6 9l6 6 6-6"/></svg>
         </button>
-        {styleOpen && (
+        {openSection === 'style' && (
           <div className="p-3 border-t border-[#e5e0d8] dark:border-[#3d2f2b] grid grid-cols-2 gap-2">
             {FRAME_STYLES.map(fs => (
               <button
@@ -141,16 +138,16 @@ export default function CustomizeStep({
 
       <div className="border border-[#e5e0d8] dark:border-[#3d2f2b] rounded-xl overflow-hidden">
         <button
-          onClick={() => setFrameOpen(o => !o)}
+          onClick={() => setOpenSection(s => s === 'frame' ? null : 'frame')}
           className="w-full flex items-center px-4 py-3 bg-[#faf8f5] dark:bg-[#1e1714] hover:bg-[#f5f0ea] dark:hover:bg-[#251e1b] transition-colors"
         >
           <div className="flex items-center justify-between flex-1 mr-2">
             <span className="text-xs font-semibold text-[#7a6f68] dark:text-[#8c7e78] uppercase tracking-wider">Frame Color</span>
             <span className="w-3 h-3 rounded-full border border-black/10 inline-block" style={{ backgroundColor: frameColor.value }} />
           </div>
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={`text-[#7a6f68] dark:text-[#8c7e78] transition-transform ${frameOpen ? 'rotate-180' : ''}`}><path d="M6 9l6 6 6-6"/></svg>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={`text-[#7a6f68] dark:text-[#8c7e78] transition-transform ${openSection === 'frame' ? 'rotate-180' : ''}`}><path d="M6 9l6 6 6-6"/></svg>
         </button>
-        {frameOpen && (
+        {openSection === 'frame' && (
           <div className="p-3 border-t border-[#e5e0d8] dark:border-[#3d2f2b] flex flex-col gap-3">
             <div className="flex gap-2 flex-wrap">
               {FRAME_COLORS.map(fc => (
@@ -218,16 +215,16 @@ export default function CustomizeStep({
 
       <div className="border border-[#e5e0d8] dark:border-[#3d2f2b] rounded-xl overflow-hidden">
         <button
-          onClick={() => setFilterOpen(o => !o)}
+          onClick={() => setOpenSection(s => s === 'filter' ? null : 'filter')}
           className="w-full flex items-center px-4 py-3 bg-[#faf8f5] dark:bg-[#1e1714] hover:bg-[#f5f0ea] dark:hover:bg-[#251e1b] transition-colors"
         >
           <div className="flex items-center justify-between flex-1 mr-2">
             <span className="text-xs font-semibold text-[#7a6f68] dark:text-[#8c7e78] uppercase tracking-wider">Filter</span>
             <span className="text-xs text-[#8B3714] dark:text-[#c4643a]">{filter.name}</span>
           </div>
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={`text-[#7a6f68] dark:text-[#8c7e78] transition-transform ${filterOpen ? 'rotate-180' : ''}`}><path d="M6 9l6 6 6-6"/></svg>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={`text-[#7a6f68] dark:text-[#8c7e78] transition-transform ${openSection === 'filter' ? 'rotate-180' : ''}`}><path d="M6 9l6 6 6-6"/></svg>
         </button>
-        {filterOpen && (
+        {openSection === 'filter' && (
           <div className="p-3 border-t border-[#e5e0d8] dark:border-[#3d2f2b] grid grid-cols-2 gap-2">
             {FILTERS.map(f => (
               <button
@@ -251,7 +248,7 @@ export default function CustomizeStep({
 
       <div className="border border-[#e5e0d8] dark:border-[#3d2f2b] rounded-xl overflow-hidden">
         <button
-          onClick={() => setStickerOpen(o => !o)}
+          onClick={() => setOpenSection(s => s === 'sticker' ? null : 'sticker')}
           className="w-full flex items-center px-4 py-3 bg-[#faf8f5] dark:bg-[#1e1714] hover:bg-[#f5f0ea] dark:hover:bg-[#251e1b] transition-colors"
         >
           <div className="flex items-center justify-between flex-1 mr-2">
@@ -262,9 +259,9 @@ export default function CustomizeStep({
                 : 'None'}
             </span>
           </div>
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={`text-[#7a6f68] dark:text-[#8c7e78] transition-transform ${stickerOpen ? 'rotate-180' : ''}`}><path d="M6 9l6 6 6-6"/></svg>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={`text-[#7a6f68] dark:text-[#8c7e78] transition-transform ${openSection === 'sticker' ? 'rotate-180' : ''}`}><path d="M6 9l6 6 6-6"/></svg>
         </button>
-        {stickerOpen && (
+        {openSection === 'sticker' && (
           <div className="border-t border-[#e5e0d8] dark:border-[#3d2f2b] flex flex-col">
             {/* Sticker picker */}
             <div className="p-3 flex flex-col gap-2">

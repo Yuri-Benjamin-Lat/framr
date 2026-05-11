@@ -16,6 +16,7 @@ const V1_RELEASES = [
       'Zoom and Drag photo for customization step',
       'Fully responsive for all screen sizes',
       'Crop guide overlay for all layouts',
+      'Several other QoL improvements and bug fixes',
     ],
   },
   {
@@ -87,13 +88,14 @@ export default function ChangelogModal({ onClose }) {
                       <span className="font-semibold text-[#1a1614] dark:text-[#ede8e0] text-sm">{release.version}</span>
                       <span className="text-xs text-[#b0a898] dark:text-[#5c4f4a]">{release.date}</span>
                     </div>
-                    <div className="flex justify-end">
+                    {/* Placeholder for future content */}
+                    {/* <div className="flex justify-end">
                       {idx === 0 && (
                         <span className="flex items-center gap-1 text-[10px] text-[#d5cfc8] dark:text-[#3d2f2b] cursor-not-allowed select-none">
                           V2.0.0 <ArrowIcon direction="right" />
                         </span>
                       )}
-                    </div>
+                    </div> */}
                   </div>
 
                   {release.description && <p className="text-xs text-[#4a3f3a] dark:text-[#c8bdb8] leading-relaxed mb-4">{release.description}</p>}
